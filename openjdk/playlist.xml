@@ -2671,15 +2671,15 @@
 		<platformRequirements>spec.linux_x86-64</platformRequirements>
 	</test>
     <test>
-		<testCaseName>test_arch_s390_z14</testCaseName>
-		<command>echo "test arch.s390.14"; \
+		<testCaseName>test_arch_s390x_z14</testCaseName>
+		<command>echo "test arch.s390x.14"; \
 		$(TEST_STATUS)</command>
-		<platformRequirements>arch.s390.14</platformRequirements>
+		<platformRequirements>arch.s390x.14</platformRequirements>
 	</test>
     <test>
-		<testCaseName>test_not_arch_s390</testCaseName>
-		<command>echo "test on none arch.s390"; \
+		<testCaseName>test_not_arch_s390x</testCaseName>
+		<command>echo "test on none arch.s390x"; \
 	$(TEST_STATUS)</command>
-		<platformRequirements>^arch.s390</platformRequirements>
+		<platformRequirements>^arch.s390x</platformRequirements>
 	</test>
 </playlist>
