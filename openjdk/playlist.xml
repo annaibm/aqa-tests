@@ -2672,14 +2672,32 @@
 	</test>
     <test>
 		<testCaseName>test_arch_s390x_z14</testCaseName>
-		<command>echo "test arch.s390x.14"; \
-		$(TEST_STATUS)</command>
+		<command>$(JAVA_COMMAND) -Xmx512m -jar $(Q)$(TEST_RESROOT)$(D)jtreg$(D)lib$(D)jtreg.jar$(Q) \
+			$(JTREG_BASIC_OPTIONS) -vmoptions:$(Q)-Xmx512m $(JVM_OPTIONS)$(Q) \
+			-w $(Q)$(REPORTDIR)$(D)work$(Q) \
+			-r $(Q)$(REPORTDIR)$(D)report$(Q) \
+			-jdk:$(Q)$(TEST_JDK_HOME)$(Q) \
+			-exclude:$(Q)$(JTREG_JDK_TEST_DIR)$(D)ProblemList.txt$(Q) \
+			-exclude:$(Q)$(TEST_RESROOT)$(D)$(PROBLEM_LIST_FILE)$(Q) \
+			${FEATURE_PROBLEM_LIST_FILE} \
+			${VENDOR_PROBLEM_LIST_FILE} \
+			$(Q)$(JTREG_JDK_TEST_DIR)/com/alibaba/management$(Q); \
+			$(TEST_STATUS)</command>
 		<platformRequirements>arch.s390x.14</platformRequirements>
 	</test>
     <test>
 		<testCaseName>test_not_arch_s390x</testCaseName>
-		<command>echo "test on none arch.s390x"; \
-	$(TEST_STATUS)</command>
+		<command>$(JAVA_COMMAND) -Xmx512m -jar $(Q)$(TEST_RESROOT)$(D)jtreg$(D)lib$(D)jtreg.jar$(Q) \
+			$(JTREG_BASIC_OPTIONS) -vmoptions:$(Q)-Xmx512m $(JVM_OPTIONS)$(Q) \
+			-w $(Q)$(REPORTDIR)$(D)work$(Q) \
+			-r $(Q)$(REPORTDIR)$(D)report$(Q) \
+			-jdk:$(Q)$(TEST_JDK_HOME)$(Q) \
+			-exclude:$(Q)$(JTREG_JDK_TEST_DIR)$(D)ProblemList.txt$(Q) \
+			-exclude:$(Q)$(TEST_RESROOT)$(D)$(PROBLEM_LIST_FILE)$(Q) \
+			${FEATURE_PROBLEM_LIST_FILE} \
+			${VENDOR_PROBLEM_LIST_FILE} \
+			$(Q)$(JTREG_JDK_TEST_DIR)/com/alibaba/management$(Q); \
+			$(TEST_STATUS)</command>
 		<platformRequirements>^arch.s390x</platformRequirements>
 	</test>
 </playlist>

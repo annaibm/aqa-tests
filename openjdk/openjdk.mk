@@ -23,32 +23,32 @@ ifeq ($(OS),Linux)
 	# This is the MEMORY_SIZE script below, with formatting for readability.
 	#
 	# // The number of megabytes of memory this machine has.
-	# KMEMMB=`awk '/^MemTotal:/{print int($$2/1024)}' /proc/meminfo`; 
+	# KMEMMB=`awk '/^MemTotal:/{print int($$2/1024)}' /proc/meminfo`;
 	#
-	# // If this machine/container uses cgroups to limit the amount of 
+	# // If this machine/container uses cgroups to limit the amount of
 	# // memory available to us, we should use that as out memory size.
 	# if [[ -r /sys/fs/cgroup/memory.max ]]; then
 	#     // Use this to identify memory maximum (bytes) for cgroup v2.
-	#     CGMEM=`cat /sys/fs/cgroup/memory.max 2>1`; 
+	#     CGMEM=`cat /sys/fs/cgroup/memory.max 2>1`;
 	# else
 	#     // Else use this file for memory maximum (bytes) on cgroup v1.
-	#     CGMEM=`cat /sys/fs/cgroup/memory/memory.limit_in_bytes 2>1`; 
-	# fi; 
+	#     CGMEM=`cat /sys/fs/cgroup/memory/memory.limit_in_bytes 2>1`;
+	# fi;
 	#
 	# // If those files were empty, or didn't exist, or had non-numbers
 	# // in them, then use /proc/meminfo (converted to bytes).
 	# if [[ ! $$(CGMEM) =~ ^[0-9]+$$ ]]; then
-	#     CGMEM=`expr $${KMEMMB} \* 1024 \* 1024`; 
-	# fi; 
+	#     CGMEM=`expr $${KMEMMB} \* 1024 \* 1024`;
+	# fi;
 	#
-	# CGMEMMB=`expr $${CGMEM} / 1024 / 1024`; 
+	# CGMEMMB=`expr $${CGMEM} / 1024 / 1024`;
 	#
 	# // Between memory limits in the cgroup and memory on the machine,
 	# // use the lower limit. This protects us against situations
 	# // where the cgroup has a value which is much bigger/smaller than
 	# // the limits on the machine overall. We've seen both.
-	# if [ "$${KMEMMB}" -lt "$${CGMEMMB}" ]; then 
-	#     echo "$${KMEMMB}"; else echo "$${CGMEMMB}"; 
+	# if [ "$${KMEMMB}" -lt "$${CGMEMMB}" ]; then
+	#     echo "$${KMEMMB}"; else echo "$${CGMEMMB}";
 	# fi
 	MEMORY_SIZE:=$(shell KMEMMB=`awk '/^MemTotal:/{print int($$2/1024)}' /proc/meminfo`; if [[ -r /sys/fs/cgroup/memory.max ]]; then CGMEM=`cat /sys/fs/cgroup/memory.max 2>1`; else CGMEM=`cat /sys/fs/cgroup/memory/memory.limit_in_bytes 2>1`; fi; if [[ ! $${CGMEM} =~ ^[0-9]+$$ ]]; then CGMEM=`expr $${KMEMMB} \* 1024 \* 1024`; fi; CGMEMMB=`expr $${CGMEM} / 1024 / 1024`; if [ "$${KMEMMB}" -lt "$${CGMEMMB}" ]; then echo "$${KMEMMB}"; else echo "$${CGMEMMB}"; fi)
 endif
@@ -67,10 +67,10 @@ ifeq ($(CYGWIN),1)
 		| cut -d "=" -f 2-` / 1024 / 1024 \
 		)
 endif
-ifeq ($(OS),SunOS)	
+ifeq ($(OS),SunOS)
 	NPROCS:=$(shell psrinfo | wc -l)
 	MEMORY_SIZE:=$(shell prtconf | awk '/^Memory size:/{print int($$3/1024)}')
-endif	
+endif
 ifeq ($(OS),OS/390)
 	EXTRA_OPTIONS += -Dcom.ibm.tools.attach.enable=yes
 endif
@@ -153,7 +153,7 @@ ifneq ($(filter openj9 ibm, $(JDK_IMPL)),)
 	endif
 endif
 
-ifdef OPENJDK_DIR 
+ifdef OPENJDK_DIR
 # removing "
 OPENJDK_DIR := $(subst ",,$(OPENJDK_DIR))
 else
@@ -189,7 +189,7 @@ ifneq ($(JDK_VERSION),8)
 		else ifneq ($(filter openj9 ibm, $(JDK_IMPL)),)
 			JVM_NATIVE_OPTIONS := -nativepath:"$(TESTIMAGE_PATH)$(D)openj9"
 		endif
-		ifneq (,$(findstring /hotspot/, $(JDK_CUSTOM_TARGET))) 
+		ifneq (,$(findstring /hotspot/, $(JDK_CUSTOM_TARGET)))
 			CUSTOM_NATIVE_OPTIONS := $(JVM_NATIVE_OPTIONS)
 		else
 			CUSTOM_NATIVE_OPTIONS := $(JDK_NATIVE_OPTIONS)
@@ -219,7 +219,7 @@ ifneq ($(filter openj9 ibm, $(JDK_IMPL)),)
 	TEST_VARIATION_JIT_PREVIEW:=-XX:-JITServerTechPreviewMessage
 	TEST_VARIATION_JIT_AGGRESIVE:=-Xjit:enableAggressiveLiveness
 	TIMEOUT_HANDLER:=-timeoutHandler:jtreg.openj9.CoreDumpTimeoutHandler -timeoutHandlerDir:$(Q)$(LIB_DIR)$(D)openj9jtregtimeouthandler.jar$(Q)
-	EXTRA_OPTIONS := -Xverbosegclog $(EXTRA_OPTIONS)
+	EXTRA_OPTIONS := $(EXTRA_OPTIONS)
 endif
 
 # if cannot find the problem list file, set to default file
@@ -234,7 +234,7 @@ ifneq ($(filter 11 16, $(JDK_VERSION)),)
 endif
 
 FEATURE_PROBLEM_LIST_FILE:=
-ifneq (,$(findstring FIPS140_2, $(TEST_FLAG))) 
+ifneq (,$(findstring FIPS140_2, $(TEST_FLAG)))
 	FEATURE_PROBLEM_LIST_FILE:=-exclude:$(Q)$(JTREG_JDK_TEST_DIR)$(D)ProblemList-FIPS140_2.txt$(Q)
 else ifneq (,$(findstring FIPS140_3_OpenJCEPlus, $(TEST_FLAG)))
 	FEATURE_PROBLEM_LIST_FILE:=-exclude:$(Q)$(JTREG_JDK_TEST_DIR)$(D)ProblemList-FIPS140_3_OpenJcePlus.txt$(Q)
