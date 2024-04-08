@@ -2672,11 +2672,11 @@
 		<platformRequirements>spec.linux_x86-64</platformRequirements>
 	</test>
     <test>
-		<testCaseName>test_arch_s390x_14</testCaseName>
-		<command>echo "test arch.s390x.14"; \
+		<testCaseName>test_arch_s390x_z14</testCaseName>
+		<command>echo "test arch.s390x.z14"; \
 		$(TEST_STATUS)</command>
 		<platformRequirementsList>
-			<platformRequirements>arch.s390x.14</platformRequirements>
+			<platformRequirements>arch.s390x.z14</platformRequirements>
 		</platformRequirementsList>
 	</test>
 
