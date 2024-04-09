@@ -1305,7 +1305,7 @@
 		<groups>
 			<group>openjdk</group>
 		</groups>
-        <platformRequirements>arch.390.14</platformRequirements>
+		<platformRequirements>arch.390.14</platformRequirements>
 	</test>
 	<test>
 		<testCaseName>jdk_time</testCaseName>
@@ -2672,18 +2672,18 @@
 		<platformRequirements>spec.linux_x86-64</platformRequirements>
 	</test>
 
-    <test>
+	<test>
 		<testCaseName>test_os_linux_ubuntu22</testCaseName>
 		<command>echo "test os.linux.ubuntu.22"; \
 	$(TEST_STATUS)</command>
 		<platformRequirements>os.linux.ubuntu.22</platformRequirements>
 	</test>
 
-<test>
-		<testCaseName>test_not_arch_s390x</testCaseName>
-		<command>echo "test on none arch.s390x"; \
+	<test>
+		<testCaseName>test_not_arch_390</testCaseName>
+		<command>echo "test on none arch.390"; \
 	$(TEST_STATUS)</command>
-		<platformRequirements>^arch.s390x</platformRequirements>
+		<platformRequirements>^arch.390</platformRequirements>
 	</test>
 
 	<test>
