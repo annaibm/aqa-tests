@@ -2672,11 +2672,11 @@
 		<platformRequirements>spec.linux_x86-64</platformRequirements>
 	</test>
     <test>
-		<testCaseName>test_arch_s390x_z14</testCaseName>
-		<command>echo "test arch.s390x.z14"; \
+		<testCaseName>test_arch_390_z14</testCaseName>
+		<command>echo "test arch.390.z14"; \
 		$(TEST_STATUS)</command>
 		<platformRequirementsList>
-			<platformRequirements>arch.s390x.z14</platformRequirements>
+			<platformRequirements>arch.390.z14</platformRequirements>
 		</platformRequirementsList>
 	</test>
 
@@ -2692,7 +2692,7 @@
 			${FEATURE_PROBLEM_LIST_FILE} \
 			${VENDOR_PROBLEM_LIST_FILE} \
 			$(TEST_STATUS)</command>
-		<platformRequirements>^arch.s390x</platformRequirements>
+		<platformRequirements>^arch.390</platformRequirements>
 	</test>
 
     <test>
