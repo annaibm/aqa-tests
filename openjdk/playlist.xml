@@ -1305,7 +1305,7 @@
 		<groups>
 			<group>openjdk</group>
 		</groups>
-        <platformRequirements>arch.s390x.14</platformRequirements>
+        <platformRequirements>arch.390.14</platformRequirements>
 	</test>
 	<test>
 		<testCaseName>jdk_time</testCaseName>
@@ -2671,7 +2671,57 @@
 		</vendors>
 		<platformRequirements>spec.linux_x86-64</platformRequirements>
 	</test>
+
     <test>
+		<testCaseName>test_os_linux_ubuntu22</testCaseName>
+		<command>echo "test os.linux.ubuntu.22"; \
+	$(TEST_STATUS)</command>
+		<platformRequirements>os.linux.ubuntu.22</platformRequirements>
+	</test>
+
+<test>
+		<testCaseName>test_not_arch_s390x</testCaseName>
+		<command>echo "test on none arch.s390x"; \
+	$(TEST_STATUS)</command>
+		<platformRequirements>^arch.s390x</platformRequirements>
+	</test>
+
+	<test>
+		<testCaseName>test_arch_x86_skylake</testCaseName>
+		<command>echo "test arch.x86.skylake"; \
+		$(TEST_STATUS)</command>
+		<platformRequirementsList>
+			<platformRequirements>arch.x86.skylake</platformRequirements>
+		</platformRequirementsList>
+	</test>
+
+	<test>
+		<testCaseName>test_arch_390_z15plus</testCaseName>
+		<command>echo "test arch.390.z15+"; \
+		$(TEST_STATUS)</command>
+		<platformRequirementsList>
+			<platformRequirements>arch.390.z15+</platformRequirements>
+		</platformRequirementsList>
+	</test>
+
+	<test>
+		<testCaseName>test_arch_390_z15</testCaseName>
+		<command>echo "test arch.390.z15"; \
+		$(TEST_STATUS)</command>
+		<platformRequirementsList>
+			<platformRequirements>arch.390.z15</platformRequirements>
+		</platformRequirementsList>
+	</test>
+	<test>
+		<testCaseName>test_arch_390_z14plus</testCaseName>
+		<command>echo "test arch.390.z14+"; \
+		$(TEST_STATUS)</command>
+		<platformRequirementsList>
+			<platformRequirements>arch.390.z14+</platformRequirements>
+		</platformRequirementsList>
+	</test>
+
+	<test>
 		<testCaseName>test_arch_390_z14</testCaseName>
 		<command>echo "test arch.390.z14"; \
 		$(TEST_STATUS)</command>
@@ -2680,26 +2730,22 @@
 		</platformRequirementsList>
 	</test>
 
-    <test>
-		<testCaseName>test_not_arch_s390x</testCaseName>
-		<command>$(JAVA_COMMAND) -Xmx512m -jar $(Q)$(TEST_RESROOT)$(D)jtreg$(D)lib$(D)jtreg.jar$(Q) \
-			$(JTREG_BASIC_OPTIONS) -vmoptions:$(Q)-Xmx512m $(JVM_OPTIONS)$(Q) \
-			-w $(Q)$(REPORTDIR)$(D)work$(Q) \
-			-r $(Q)$(REPORTDIR)$(D)report$(Q) \
-			-jdk:$(Q)$(TEST_JDK_HOME)$(Q) \
-			-exclude:$(Q)$(JTREG_JDK_TEST_DIR)$(D)ProblemList.txt$(Q) \
-			-exclude:$(Q)$(TEST_RESROOT)$(D)$(PROBLEM_LIST_FILE)$(Q) \
-			${FEATURE_PROBLEM_LIST_FILE} \
-			${VENDOR_PROBLEM_LIST_FILE} \
-			$(TEST_STATUS)</command>
-		<platformRequirements>^arch.390</platformRequirements>
+	<test>
+		<testCaseName>test_arch_390_z13plus</testCaseName>
+		<command>echo "test arch.390.z13+"; \
+		$(TEST_STATUS)</command>
+		<platformRequirementsList>
+			<platformRequirements>arch.390.z13+</platformRequirements>
+		</platformRequirementsList>
 	</test>
 
-    <test>
-		<testCaseName>test_os_linux_ubuntu22</testCaseName>
-		<command>echo "test os.linux.ubuntu.22"; \
-	$(TEST_STATUS)</command>
-		<platformRequirements>os.linux.ubuntu.22</platformRequirements>
+	<test>
+		<testCaseName>test_arch_390_z13</testCaseName>
+		<command>echo "test arch.390.z13"; \
+		$(TEST_STATUS)</command>
+		<platformRequirementsList>
+			<platformRequirements>arch.390.z13</platformRequirements>
+		</platformRequirementsList>
 	</test>
 
 </playlist>
