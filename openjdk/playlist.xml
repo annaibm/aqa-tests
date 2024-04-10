@@ -2747,5 +2747,13 @@
 			<platformRequirements>arch.390.z13</platformRequirements>
 		</platformRequirementsList>
 	</test>
+	<test>
+		<testCaseName>test_arch_390_14</testCaseName>
+		<command>echo "test arch.390.z14"; \
+		$(TEST_STATUS)</command>
+		<platformRequirementsList>
+			<platformRequirements>arch.390.14</platformRequirements>
+		</platformRequirementsList>
+	</test>
 
 </playlist>
