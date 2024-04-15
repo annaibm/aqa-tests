@@ -318,6 +318,12 @@
 	</target>
 
 	<target name="common_dist" description="generate the distribution">
+        <condition property="system_lib_dir" value="${env.SYSTEM_LIB_DIR}" else="${TEST_ROOT}/systemtest_prereqs/">
+            <isset property="env.SYSTEM_LIB_DIR"/>
+        </condition>
+		<echo message="SYSTEMTEST_DEST is set to: ${SYSTEMTEST_DEST}" />
+		<echo message="TEST_ROOT is set to: ${TEST_ROOT}" />
+		<echo message="SYSTEM_LIB_DIR is set to: ${env.SYSTEM_LIB_DIR}" />
 		<copy todir="${SYSTEMTEST_DEST}/STF">
 			<fileset dir="${SYSTEMTEST_ROOT}/STF" includes="**" />
 		</copy>
@@ -337,7 +343,7 @@
 				</then>
 		</if>
 		<copy todir="${SYSTEMTEST_DEST}/systemtest_prereqs/">
-			<fileset dir="${TEST_ROOT}/systemtest_prereqs/" includes="**" />
+			<fileset dir="${system_lib_dir}" includes="**"/>
 		</copy>
 	</target>
 

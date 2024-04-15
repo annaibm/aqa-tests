@@ -16,10 +16,10 @@ ifndef CYGWIN
   OSTYPE?=$(shell echo $$OSTYPE)
   CYGWIN:=0
   ifeq ($(OSTYPE),cygwin)
-    CYGWIN:=1
+	CYGWIN:=1
   endif
   ifeq ($(TERM),cygwin)
-    CYGWIN:=1
+	CYGWIN:=1
   endif
 endif
 $(warning CYGWIN is $(CYGWIN))
@@ -31,9 +31,9 @@ ifeq ($(CYGWIN),1)
   $(warning Running under cygwin, looking for Windows perl on path)
   PERL:=$(shell which -a perl.exe | grep /perl/bin | sort | uniq)
   ifeq (,$(PERL))
-    $(error Unable to find Windows perl e.g. Strawberry perl in a /perl/bin subdirectory on PATH.  Install perl or add to PATH and retry)
+	$(error Unable to find Windows perl e.g. Strawberry perl in a /perl/bin subdirectory on PATH.  Install perl or add to PATH and retry)
   else
-    $(warning Found perl in $(PERL))
+	$(warning Found perl in $(PERL))
   endif
   PERL:=$(dir $(PERL))
   export PATH:=$(PERL):$(PATH)
@@ -71,15 +71,21 @@ ifdef JVM_OPTIONS
   APPLICATION_OPTIONS := $(APPLICATION_OPTIONS) -jvmArgs $(Q)$(JVM_OPTIONS)$(Q)
 endif
 
+ifndef SYSTEM_LIB_DIR
+  SYSTEM_LIB_DIR := "/home/jenkins/workspace/Grinder/aqa-tests/systemtest_prereqs"
+endif
+
+$(info SYSTEM_LIB_DIR is $(SYSTEM_LIB_DIR))
+
 define SYSTEMTEST_CMD_TEMPLATE
 perl $(SYSTEMTEST_RESROOT)$(D)STF$(D)stf.core$(D)scripts$(D)stf.pl \
   -test-root=$(Q)$(SYSTEMTEST_RESROOT)$(D)STF;$(SYSTEMTEST_RESROOT)$(D)aqa-systemtest$(OPENJ9_PRAM)$(Q) \
-  -systemtest-prereqs=$(Q)$(SYSTEMTEST_RESROOT)$(D)systemtest_prereqs$(Q) \
+  -systemtest-prereqs=$(Q)$(SYSTEM_LIB_DIR)$(D)$(Q) \
   -java-args=$(SQ)$(JAVA_ARGS)$(SQ) \
   -results-root=$(REPORTDIR)
 endef
 
-# Default test to be run for system_custom in regular system test builds 
+# Default test to be run for system_custom in regular system test builds
 CUSTOM_TARGET ?= -test=ClassloadingLoadTest
 
 ifneq ($(JDK_VERSION),8)
