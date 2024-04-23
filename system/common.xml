@@ -7,6 +7,7 @@
 	<property name="SYSTEMTEST_ROOT" value="${TEST_ROOT}/system" />
 	<property name="SYSTEMTEST_DEST" value="${BUILD_ROOT}/system" />
 	<property environment="env" />
+	 <property name="SYSTEM_LIB_DIR" value="${env.SYSTEM_LIB_DIR}" />
 
 	<condition property="isZOS" value="true">
 		<equals arg1="${os.name}" arg2="z/OS"/>
@@ -320,6 +321,7 @@
 	<target name="common_dist" description="generate the distribution">
 		<echo message="SYSTEMTEST_DEST is set to: ${SYSTEMTEST_DEST}" />
 		<echo message="TEST_ROOT is set to: ${TEST_ROOT}" />
+		<echo message="SYSTEM_LIB_DIR is set to: ${SYSTEM_LIB_DIR}" />
 
 		<echo message="Copying to: ${SYSTEMTEST_DEST}/systemtest_prereqs" />
 		<echo message="Copying from: ${TEST_ROOT}/systemtest_prereqs" />
