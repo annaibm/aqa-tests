@@ -322,7 +322,7 @@
 		<echo message="TEST_ROOT is set to: ${TEST_ROOT}" />
 
 		<echo message="Copying to: ${SYSTEMTEST_DEST}/systemtest_prereqs" />
-		<echo message="Copying from: ${TEST_ROOT}/systemtest_prereqs/" />
+		<echo message="Copying from: ${TEST_ROOT}/systemtest_prereqs" />
 		<copy todir="${SYSTEMTEST_DEST}/STF">
 			<fileset dir="${SYSTEMTEST_ROOT}/STF" includes="**" />
 		</copy>
@@ -342,7 +342,7 @@
 				</then>
 		</if>
 		<copy todir="${SYSTEMTEST_DEST}/systemtest_prereqs/">
-			<fileset dir="${TEST_ROOT}/systemtest_prereqs/" includes="**" />
+			<fileset dir="${SYSTEM_LIB_DIR}" includes="**" />
 		</copy>
 	</target>
 
