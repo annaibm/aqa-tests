@@ -336,8 +336,8 @@
 					<chmod file="${SYSTEMTEST_DEST}/openj9-systemtest/openj9.test.sharedClasses.jvmti/bin/native/**" perm="755"/>
 				</then>
 		</if>
-		<copy todir="${SYSTEMTEST_DEST}/systemtest_prereqs/">
-			<fileset dir="${TEST_ROOT}/systemtest_prereqs/" includes="**" />
+		<copy todir="${SYSTEM_LIB_DIR}">
+			<fileset dir="${SYSTEM_LIB_DIR}" includes="**" />
 		</copy>
 	</target>
 
