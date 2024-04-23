@@ -74,7 +74,7 @@ endif
 define SYSTEMTEST_CMD_TEMPLATE
 perl $(SYSTEMTEST_RESROOT)$(D)STF$(D)stf.core$(D)scripts$(D)stf.pl \
   -test-root=$(Q)$(SYSTEMTEST_RESROOT)$(D)STF;$(SYSTEMTEST_RESROOT)$(D)aqa-systemtest$(OPENJ9_PRAM)$(Q) \
-  -systemtest-prereqs=$(Q)$(SYSTEMTEST_RESROOT)$(D)../../../../testDependency/system_lib$(Q) \
+  -systemtest-prereqs="/home/jenkins/testDependency/system_lib" \
   -java-args=$(SQ)$(JAVA_ARGS)$(SQ) \
   -results-root=$(REPORTDIR)
 endef
