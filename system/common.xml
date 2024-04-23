@@ -344,7 +344,7 @@
 				</then>
 		</if>
 		<copy todir="${SYSTEMTEST_DEST}/systemtest_prereqs/">
-			<fileset dir="${SYSTEM_LIB_DIR}" includes="**" />
+			<fileset dir="../../../../../testDependency/system_lib" includes="**" />
 		</copy>
 	</target>
 
