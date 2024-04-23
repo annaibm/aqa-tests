@@ -320,6 +320,9 @@
 	<target name="common_dist" description="generate the distribution">
         <echo message="SYSTEMTEST_DEST is set to: ${SYSTEMTEST_DEST}" />
         <echo message="TEST_ROOT is set to: ${TEST_ROOT}" />
+
+        <echo message="Copying to: ${SYSTEMTEST_DEST}/system_lib/" />
+        <echo message="Copying from: ${TEST_ROOT}/../../../../../testDependency/system_lib/" />
 		<copy todir="${SYSTEMTEST_DEST}/STF">
 			<fileset dir="${SYSTEMTEST_ROOT}/STF" includes="**" />
 		</copy>
@@ -338,8 +341,8 @@
 					<chmod file="${SYSTEMTEST_DEST}/openj9-systemtest/openj9.test.sharedClasses.jvmti/bin/native/**" perm="755"/>
 				</then>
 		</if>
-		<copy todir="${SYSTEMTEST_DEST}/../../../../testDependency/system_lib/">
-			<fileset dir="${TEST_ROOT}/../../../../testDependency/system_lib/" includes="**" />
+		<copy todir="${SYSTEMTEST_DEST}/systemtest_prereqs/">
+			<fileset dir="${TEST_ROOT}/../../jvmtest/system/otherLoadTest/../../../../../testDependency/system_lib" includes="**" />
 		</copy>
 	</target>
 
