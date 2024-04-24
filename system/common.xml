@@ -343,9 +343,7 @@
 					<chmod file="${SYSTEMTEST_DEST}/openj9-systemtest/openj9.test.sharedClasses.jvmti/bin/native/**" perm="755"/>
 				</then>
 		</if>
-		<copy todir="${SYSTEMTEST_DEST}/systemtest_prereqs/">
-			<fileset dir="${SYSTEM_LIB_DIR}" includes="**"/>
-		</copy>
+
 	</target>
 
 	<!-- target to build all projects in the repository.  -->
