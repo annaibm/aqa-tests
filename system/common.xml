@@ -322,9 +322,6 @@
 		<echo message="SYSTEMTEST_DEST is set to: ${SYSTEMTEST_DEST}" />
 		<echo message="TEST_ROOT is set to: ${TEST_ROOT}" />
 		<echo message="SYSTEM_LIB_DIR is set to: ${SYSTEM_LIB_DIR}" />
-
-		<echo message="Copying to: ${SYSTEMTEST_DEST}/systemtest_prereqs" />
-		<echo message="Copying from: ${TEST_ROOT}/systemtest_prereqs" />
 		<copy todir="${SYSTEMTEST_DEST}/STF">
 			<fileset dir="${SYSTEMTEST_ROOT}/STF" includes="**" />
 		</copy>
@@ -343,7 +340,9 @@
 					<chmod file="${SYSTEMTEST_DEST}/openj9-systemtest/openj9.test.sharedClasses.jvmti/bin/native/**" perm="755"/>
 				</then>
 		</if>
-
+        <copy todir="${SYSTEMTEST_DEST}/systemtest_prereqs/">
+            <fileset dir="${SYSTEM_LIB_DIR}" includes="**"/>
+        </copy>
 	</target>
 
 	<!-- target to build all projects in the repository.  -->

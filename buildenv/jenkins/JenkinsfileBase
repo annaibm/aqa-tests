@@ -205,7 +205,7 @@ def setupParallelEnv() {
 
 			try {
 				// check pre-stage test libs on the machine
-				// check for each lib. If lib does not exist, donwload it.
+				// check for each lib. If lib does not exist, download it.
 				// If lib exists, SHA will be checked. Re-download if SHA does not match.
 				timeout(time: 20, unit: 'MINUTES') {
 					def defaultUrl = "https://ci.adoptium.net/job/test.getDependency/lastSuccessfulBuild/artifact/"
