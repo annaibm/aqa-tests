@@ -666,7 +666,11 @@ def buildTest() {
 				if (PLATFORM.contains("windows")) {
 					env.LIB_DIR = env.LIB_DIR.replaceAll("\\\\", "/")
 				}
-				sh "perl ./aqa-tests/TKG/scripts/getDependencies.pl -path ${env.LIB_DIR} -task default -customUrl ${customUrl}"
+                if (env.BUILD_LIST != 'system') {
+				    sh "perl ./aqa-tests/TKG/scripts/getDependencies.pl -path ${env.LIB_DIR} -task default -customUrl ${customUrl}"
+                } else {
+                    sh "perl ./aqa-tests/TKG/scripts/getDependencies.pl -path ${env.LIB_DIR} -task default"
+                }
 			}
  		} catch (Exception e) {
 			echo 'Exception: ' + e.toString()
