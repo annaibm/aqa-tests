@@ -209,7 +209,7 @@ def setupParallelEnv() {
 				// If lib exists, SHA will be checked. Re-download if SHA does not match.
 				timeout(time: 20, unit: 'MINUTES') {
 					def defaultUrl = "https://ci.adoptium.net/job/test.getDependency/lastSuccessfulBuild/artifact/"
-					def systemUrl = ""
+					def systemUrl = "https://ci.adoptium.net/job/systemtest.getDependency/lastSuccessfulBuild/artifact/"
 					env.LIB_DIR = (env.BUILD_LIST == 'system') ? env.SYSTEM_LIB_DIR : env.LIB_DIR
 					def customUrl = (env.BUILD_LIST == 'system') ? systemUrl : defaultUrl
 					if (PLATFORM.contains("windows")) {
