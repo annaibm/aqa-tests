@@ -107,7 +107,7 @@ def setupEnv() {
 	NUM_MACHINES = params.NUM_MACHINES ? params.NUM_MACHINES.toInteger() : 1
 	env.LIB_DIR = JOB_NAME.contains("SmokeTests") ? "${WORKSPACE}/../../../../../testDependency/lib" : "${WORKSPACE}/../../testDependency/lib"
 	env.SYSTEM_LIB_DIR = JOB_NAME.contains("SmokeTests") ? "${WORKSPACE}/../../../../../testDependency/system_lib" : "${WORKSPACE}/../../testDependency/system_lib"
-    env.OPENJCEPLUS_GIT_REPO = params.OPENJCEPLUS_GIT_REPO ?: "https://github.com/ibmruntimes/OpenJCEPlus.git"
+	env.OPENJCEPLUS_GIT_REPO = params.OPENJCEPLUS_GIT_REPO ?: "https://github.com/ibmruntimes/OpenJCEPlus.git"
 	env.OPENJCEPLUS_GIT_BRANCH = params.OPENJCEPLUS_GIT_BRANCH ?: "semeru-java${params.JDK_VERSION}"
 
 	env.LIGHT_WEIGHT_CHECKOUT = (params.LIGHT_WEIGHT_CHECKOUT == false) ? params.LIGHT_WEIGHT_CHECKOUT : true
@@ -215,12 +215,13 @@ def setupParallelEnv() {
 					def customUrl = (env.BUILD_LIST == 'system') ? systemUrl : defaultUrl
 					if (PLATFORM.contains("windows")) {
 					env.LIB_DIR = env.LIB_DIR.replaceAll("\\\\", "/")
-				    }
-                    if (env.BUILD_LIST != 'system') {
-                        sh "perl ./aqa-tests/TKG/scripts/getDependencies.pl -path ${env.LIB_DIR} -task default -customUrl ${customUrl}"
-                    } else {
-                        sh "perl ./aqa-tests/TKG/scripts/getDependencies.pl -path ${env.LIB_DIR} -task default"
-                    }
+					}
+					sh "perl ./aqa-tests/TKG/scripts/getDependencies.pl -path ${env.LIB_DIR} -task default -customUrl ${customUrl}"
+					// if (env.BUILD_LIST != 'system') {
+					//     sh "perl ./aqa-tests/TKG/scripts/getDependencies.pl -path ${env.LIB_DIR} -task default -customUrl ${customUrl}"
+					// } else {
+					//     sh "perl ./aqa-tests/TKG/scripts/getDependencies.pl -path ${env.LIB_DIR} -task default"
+					// }
 			} catch (Exception e) {
 				echo 'Exception: ' + e.toString()
 				echo "Cannot pre-stage test libs from ${env.LIB_DIR} on the machine. Skipping..."
@@ -670,11 +671,12 @@ def buildTest() {
 				if (PLATFORM.contains("windows")) {
 					env.LIB_DIR = env.LIB_DIR.replaceAll("\\\\", "/")
 				}
-				if (env.BUILD_LIST != 'system') {
-					sh "perl ./aqa-tests/TKG/scripts/getDependencies.pl -path ${env.LIB_DIR} -task default -customUrl ${customUrl}"
-				} else {
-					sh "perl ./aqa-tests/TKG/scripts/getDependencies.pl -path ${env.LIB_DIR} -task default"
-				}
+				sh "perl ./aqa-tests/TKG/scripts/getDependencies.pl -path ${env.LIB_DIR} -task default -customUrl ${customUrl}"
+				// if (env.BUILD_LIST != 'system') {
+				// 	sh "perl ./aqa-tests/TKG/scripts/getDependencies.pl -path ${env.LIB_DIR} -task default -customUrl ${customUrl}"
+				// } else {
+				// 	sh "perl ./aqa-tests/TKG/scripts/getDependencies.pl -path ${env.LIB_DIR} -task default"
+				// }
 			}
  		} catch (Exception e) {
 			echo 'Exception: ' + e.toString()
