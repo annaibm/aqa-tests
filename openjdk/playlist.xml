@@ -1468,7 +1468,6 @@
 		<levels>
 			<level>extended</level>
 		</levels>
-        <platformRequirements>^arch.390.z14+</platformRequirements>
 		<groups>
 			<group>openjdk</group>
 		</groups>
