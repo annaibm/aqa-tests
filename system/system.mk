@@ -39,6 +39,7 @@ ifeq ($(CYGWIN),1)
   export PATH:=$(PERL):$(PATH)
 endif
 
+$(info TEST_RESROOT is $(TEST_RESROOT))
 SYSTEMTEST_RESROOT=$(TEST_RESROOT)/../
 
 ifeq (,$(findstring $(JDK_IMPL),hotspot))
@@ -79,7 +80,7 @@ perl $(SYSTEMTEST_RESROOT)$(D)STF$(D)stf.core$(D)scripts$(D)stf.pl \
   -results-root=$(REPORTDIR)
 endef
 
-# Default test to be run for system_custom in regular system test builds 
+# Default test to be run for system_custom in regular system test builds
 CUSTOM_TARGET ?= -test=ClassloadingLoadTest
 
 ifneq ($(JDK_VERSION),8)
