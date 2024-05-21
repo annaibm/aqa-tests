@@ -41,6 +41,7 @@ endif
 
 $(info TEST_RESROOT is $(TEST_RESROOT))
 SYSTEMTEST_RESROOT=$(TEST_RESROOT)/../
+$(info SYSTEMTEST_RESROOT is $(SYSTEMTEST_RESROOT))
 
 ifeq (,$(findstring $(JDK_IMPL),hotspot))
   OPENJ9_PRAM=;$(SYSTEMTEST_RESROOT)$(D)openj9-systemtest
