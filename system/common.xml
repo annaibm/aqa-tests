@@ -319,9 +319,6 @@
 	</target>
 
 	<target name="common_dist" description="generate the distribution">
-		<echo message="SYSTEM_LIB_DIR: ${env.SYSTEM_LIB_DIR}" />
-    	<echo message="SYSTEMTEST_DEST: ${SYSTEMTEST_DEST}" />
-		<echo message="TEST_ROOT: ${TEST_ROOT}" />
 		<copy todir="${SYSTEMTEST_DEST}/STF">
 			<fileset dir="${SYSTEMTEST_ROOT}/STF" includes="**" />
 		</copy>
@@ -346,14 +343,14 @@
 			</not>
 		</condition>
 		<if>
-        	<isset property="system_lib_dir_not_set"/>
-        	<then>
+			<isset property="system_lib_dir_not_set"/>
+			<then>
 				<mkdir dir="${SYSTEMTEST_DEST}/systemtest_prereqs"/>
 				<copy todir="${SYSTEMTEST_DEST}/systemtest_prereqs/">
 					<fileset dir="${TEST_ROOT}/systemtest_prereqs/" includes="**"/>
 				</copy>
-        	</then>
-    	</if>
+			</then>
+		</if>
 	</target>
 
 	<!-- target to build all projects in the repository.  -->
