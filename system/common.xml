@@ -44,7 +44,6 @@
 			</not>
 			<then>
 				<mkdir dir="${SYSTEMTEST_DEST}" />
-				<mkdir dir="${SYSTEMTEST_DEST}/systemtest_prereqs"/>
 			</then>
 		</if>
 	</target>
@@ -337,13 +336,15 @@
 					<chmod file="${SYSTEMTEST_DEST}/openj9-systemtest/openj9.test.sharedClasses.jvmti/bin/native/**" perm="755"/>
 				</then>
 		</if>
-		<condition property="system_lib_dir_not_set">
-			<not>
-				<isset property="env.SYSTEM_LIB_DIR"/>
-			</not>
+		<condition property="system_lib_dir_not_set" value="true" else="false">
+    		<not>
+        		<isset property="env.SYSTEM_LIB_DIR"/>
+    		</not>
 		</condition>
+		<echo message="SYSTEM_LIB_DIR is set: ${env.SYSTEM_LIB_DIR}, Condition is: ${system_lib_dir_not_set}"/>
+
 		<if>
-			<isset property="system_lib_dir_not_set"/>
+    		<equals arg1="${system_lib_dir_not_set}" arg2="true"/>
 			<then>
 				<mkdir dir="${SYSTEMTEST_DEST}/systemtest_prereqs"/>
 				<copy todir="${SYSTEMTEST_DEST}/systemtest_prereqs/">
