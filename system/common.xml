@@ -44,6 +44,7 @@
 			</not>
 			<then>
 				<mkdir dir="${SYSTEMTEST_DEST}" />
+				<mkdir dir="${SYSTEMTEST_DEST}/systemtest_prereqs"/>
 			</then>
 		</if>
 	</target>
@@ -318,6 +319,9 @@
 	</target>
 
 	<target name="common_dist" description="generate the distribution">
+		<echo message="SYSTEM_LIB_DIR: ${env.SYSTEM_LIB_DIR}" />
+    	<echo message="SYSTEMTEST_DEST: ${SYSTEMTEST_DEST}" />
+		<echo message="TEST_ROOT: ${TEST_ROOT}" />
 		<copy todir="${SYSTEMTEST_DEST}/STF">
 			<fileset dir="${SYSTEMTEST_ROOT}/STF" includes="**" />
 		</copy>
@@ -336,7 +340,14 @@
 					<chmod file="${SYSTEMTEST_DEST}/openj9-systemtest/openj9.test.sharedClasses.jvmti/bin/native/**" perm="755"/>
 				</then>
 		</if>
-
+		<condition property="system_lib_dir_not_set_or_unavailable">
+			<not>
+				<isset property="env.SYSTEM_LIB_DIR"/>
+			</not>
+		</condition>
+		<copy todir="${SYSTEMTEST_DEST}/systemtest_prereqs/" if="system_lib_dir_not_set">
+			<fileset dir="${TEST_ROOT}/systemtest_prereqs/" includes="**" />
+		</copy>
 	</target>
 
 	<!-- target to build all projects in the repository.  -->
