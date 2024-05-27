@@ -340,14 +340,20 @@
 					<chmod file="${SYSTEMTEST_DEST}/openj9-systemtest/openj9.test.sharedClasses.jvmti/bin/native/**" perm="755"/>
 				</then>
 		</if>
-		<condition property="system_lib_dir_not_set_or_unavailable">
+		<condition property="system_lib_dir_not_set">
 			<not>
 				<isset property="env.SYSTEM_LIB_DIR"/>
 			</not>
 		</condition>
-		<copy todir="${SYSTEMTEST_DEST}/systemtest_prereqs/" if="system_lib_dir_not_set">
-			<fileset dir="${TEST_ROOT}/systemtest_prereqs/" includes="**" />
-		</copy>
+		<if>
+        	<isset property="system_lib_dir_not_set"/>
+        	<then>
+				<mkdir dir="${SYSTEMTEST_DEST}/systemtest_prereqs"/>
+				<copy todir="${SYSTEMTEST_DEST}/systemtest_prereqs/">
+					<fileset dir="${TEST_ROOT}/systemtest_prereqs/" includes="**"/>
+				</copy>
+        	</then>
+    	</if>
 	</target>
 
 	<!-- target to build all projects in the repository.  -->
