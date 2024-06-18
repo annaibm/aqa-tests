@@ -215,7 +215,7 @@ def setupParallelEnv() {
 						env.SYSTEM_LIB_DIR = env.SYSTEM_LIB_DIR.replaceAll("\\\\", "/")
 					}
 					if (env.BUILD_LIST == 'system') {
-						env.LIB_DIR = env.SYSTEM_LIB_DIR
+						env.LIB_DIR = env.SYSTEM_LIB_DIR ?: env.LIB_DIR
 					}
 					sh "perl ./aqa-tests/TKG/scripts/getDependencies.pl -path ${env.LIB_DIR} -task default -customUrl ${customUrl}"
 				}
@@ -672,7 +672,7 @@ def buildTest() {
 						env.SYSTEM_LIB_DIR = env.SYSTEM_LIB_DIR.replaceAll("\\\\", "/")
 					}
 					if (env.BUILD_LIST == 'system') {
-						env.LIB_DIR = env.SYSTEM_LIB_DIR
+						env.LIB_DIR = env.SYSTEM_LIB_DIR ?: env.LIB_DIR
 					}
 					sh "perl ./aqa-tests/TKG/scripts/getDependencies.pl -path ${env.LIB_DIR} -task default -customUrl ${customUrl}"
 				}
