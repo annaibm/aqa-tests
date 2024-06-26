@@ -350,18 +350,26 @@
 				</copy>
 			</then>
 		</if>
-		<condition property="isSVTTestRepo" value="true">
-    		<isset property="env.isSVTTestRepo"/>
-		</condition>
-		<condition property="isSVTTestRepo" value="false">
-   		 	<not>
-        		<isset property="env.isSVTTestRepo"/>
-    		</not>
-		</condition>
-		<echo message="isSVTTestRepo after condition check: ${isSVTTestRepo}"/>
-		<echo message="TEST ROOT check: ${TEST_ROOT}"/>
-		<echo message="Environment variables:"/>
-   		<echo message="${env}"/>
+		<!-- Print the value of env.isSVTTestRepo for debugging -->
+        <echo message="env.isSVTTestRepo: ${env.isSVTTestRepo}"/>
+
+        <!-- Set isSVTTestRepo based on env.isSVTTestRepo -->
+        <condition property="isSVTTestRepo" value="true">
+            <and>
+                <isset property="env.isSVTTestRepo"/>
+                <equals arg1="${env.isSVTTestRepo}" arg2="true"/>
+            </and>
+        </condition>
+        <condition property="isSVTTestRepo" value="false">
+            <or>
+                <not>
+                    <isset property="env.isSVTTestRepo"/>
+                </not>
+                <not>
+                    <equals arg1="${env.isSVTTestRepo}" arg2="true"/>
+                </not>
+            </or>
+        </condition>
 
 		<if>
 			<equals arg1="${isSVTTestRepo}" arg2="true"/>
