@@ -112,7 +112,7 @@ def setupEnv() {
 
 	env.LIGHT_WEIGHT_CHECKOUT = (params.LIGHT_WEIGHT_CHECKOUT == false) ? params.LIGHT_WEIGHT_CHECKOUT : true
 	env.GENERATE_JOBS = params.GENERATE_JOBS ?: false
-	env.IS_SVT_TESTREPO = ""
+	env.IS_SVT_TESTREPO = false
 
 	if (JOB_NAME.contains("Grinder")) {
 		def currentDate = new Date()

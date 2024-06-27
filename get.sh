@@ -639,8 +639,8 @@ getVendorTestMaterial() {
 		fi
 
 		if [[ "$repoURL" =~ "SVTTestRepo" ]]; then
-			IS_SVT_TESTREPO="true"
-			echo "isSVTTestRepo is set to $isSVTTestRepo"
+			IS_SVT_TESTREPO=true
+			echo "isSVTTestRepo is set to $IS_SVT_TESTREPO"
 		fi
 
 		echo "git clone ${branchOption} $repoURL $dest"
