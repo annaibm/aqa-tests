@@ -355,7 +355,6 @@
 		<condition property="isSVTTestRepo" value="true" else="false">
 			<and>
 				<isset property="env.IS_SVT_TESTREPO"/>
-				<equals arg1="${env.IS_SVT_TESTREPO}" arg2="true"/>
 			</and>
 		</condition>
 		
