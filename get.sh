@@ -639,9 +639,8 @@ getVendorTestMaterial() {
 		fi
 
 		if [[ "$repoURL" =~ "SVTTestRepo" ]]; then
-			echo "Vendor repo contains svtRepo"
 			isSVTTestRepo=true
-			echo "isSVTTestRepo is $isSVTTestRepo"
+			echo "isSVTTestRepo is set to $isSVTTestRepo"
 		fi
 
 		echo "git clone ${branchOption} $repoURL $dest"
@@ -769,7 +768,7 @@ checkOpenJ9RepoSHA()
 
 parseCommandLineArgs "$@"
 if [ "$USE_TESTENV_PROPERTIES" = true ]; then
-    teFile="./testenv/testenv.properties"
+	teFile="./testenv/testenv.properties"
 	if [[ "$PLATFORM" == *"zos"* ]]; then
 		echo "load ./testenv/testenv_zos.properties"
 		source ./testenv/testenv_zos.properties

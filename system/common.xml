@@ -350,29 +350,9 @@
 				</copy>
 			</then>
 		</if>
-		<!-- Print the value of env.isSVTTestRepo for debugging -->
-        <echo message="env.isSVTTestRepo: ${env.isSVTTestRepo}"/>
-
-        <!-- Set isSVTTestRepo based on env.isSVTTestRepo -->
-        <condition property="isSVTTestRepo" value="true">
-            <and>
-                <isset property="env.isSVTTestRepo"/>
-                <equals arg1="${env.isSVTTestRepo}" arg2="true"/>
-            </and>
-        </condition>
-        <condition property="isSVTTestRepo" value="false">
-            <or>
-                <not>
-                    <isset property="env.isSVTTestRepo"/>
-                </not>
-                <not>
-                    <equals arg1="${env.isSVTTestRepo}" arg2="true"/>
-                </not>
-            </or>
-        </condition>
 
 		<if>
-			<equals arg1="${isSVTTestRepo}" arg2="true"/>
+			<equals arg1="${env.isSVTTestRepo}" arg2="true"/>
 			<then>
 				<mkdir dir="${SYSTEMTEST_DEST}/systemtest_prereqs"/>
 				<mkdir dir="${TEST_ROOT}/systemtest_prereqs"/>
