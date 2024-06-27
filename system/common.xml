@@ -350,14 +350,15 @@
 				</copy>
 			</then>
 		</if>
-		<condition property="isSVTTestRepo" value="true">
-			<isset property="env.isSVTTestRepo"/>
-		</condition>
-		<condition property="isSVTTestRepo" value="false">
-   		 	<not>
+
+		<condition property="isSVTTestRepo" value="true" else="false">
+			<and>
 				<isset property="env.isSVTTestRepo"/>
-			</not>
+				<equals arg1="${env.isSVTTestRepo}" arg2="true"/>
+			</and>
 		</condition>
+		<echo message="isSVTTestRepo is ${isSVTTestRepo}"/>
+		
 		<if>
 			<equals arg1="${isSVTTestRepo}" arg2="true"/>
 			<then>
