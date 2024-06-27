@@ -351,11 +351,11 @@
 			</then>
 		</if>
 		
-		<echo message="env.IS_SVT_TESTREPO is ${env.IS_SVT_TESTREPO}"/>
+		<echo message="env.IS_SVT_TESTREPO is ${IS_SVT_TESTREPO}"/>
 		<condition property="isSVTTestRepo" value="true" else="false">
 			<and>
-				<isset property="env.IS_SVT_TESTREPO"/>
-				<equals arg1="${env.IS_SVT_TESTREPO}" arg2="true"/>
+				<isset property="IS_SVT_TESTREPO"/>
+				<equals arg1="${IS_SVT_TESTREPO}" arg2="true"/>
 			</and>
 		</condition>
 		
