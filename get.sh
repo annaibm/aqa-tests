@@ -639,7 +639,7 @@ getVendorTestMaterial() {
 		fi
 
 		if [[ "$repoURL" =~ "SVTTestRepo" ]]; then
-			IS_SVT_TESTREPO=true
+			IS_SVT_TESTREPO = true
 			echo "isSVTTestRepo is set to $IS_SVT_TESTREPO"
 		fi
 
