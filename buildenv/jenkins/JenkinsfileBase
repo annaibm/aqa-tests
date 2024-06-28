@@ -512,18 +512,18 @@ def setup() {
 		VENDOR_TEST_DIRS = (params.VENDOR_TEST_DIRS) ? "--vendor_dirs \"${params.VENDOR_TEST_DIRS}\"" : ""
 		VENDOR_TEST_SHAS = (params.VENDOR_TEST_SHAS) ? "--vendor_shas \"${params.VENDOR_TEST_SHAS}\"" : ""
 
-		def vendorRepos = params.VENDOR_TEST_REPOS.split(',')
-		// Check if any vendor repo contains SVTTestRepo
-		for (int i = 0; i < vendorRepos.size(); i++) {
-			def repoURL = vendorRepos[i]
+		// def vendorRepos = params.VENDOR_TEST_REPOS.split(',')
+		// // Check if any vendor repo contains SVTTestRepo
+		// for (int i = 0; i < vendorRepos.size(); i++) {
+		// 	def repoURL = vendorRepos[i]
 
-			echo "Vendor repo is ${repoURL}"
+		// 	echo "Vendor repo is ${repoURL}"
 
-			if (repoURL.contains('SVTTestRepo')) {
-				env.IS_SVT_TESTREPO = 'true'
-				echo "IS_SVT_TESTREPO is set to ${env.IS_SVT_TESTREPO}"
-			}
-		}
+		// 	if (repoURL.contains('SVTTestRepo')) {
+		// 		env.IS_SVT_TESTREPO = 'true'
+		// 		echo "IS_SVT_TESTREPO is set to ${env.IS_SVT_TESTREPO}"
+		// 	}
+		// }
 
 		// handle three cases (true/false/null) in params.TEST_IMAGES_REQUIRED and params.DEBUG_IMAGES_REQUIRED
 		// Only set image required to false if params is set to false. In get.sh, the default value is true
