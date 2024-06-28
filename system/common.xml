@@ -350,8 +350,8 @@
 				</copy>
 			</then>
 		</if>
-		
-		<echo message="env.IS_SVT_TESTREPO is ${IS_SVT_TESTREPO}"/>
+		<property name="IS_SVT_TESTREPO" value="${env.IS_SVT_TESTREPO}"/>
+    	<echo message="env.IS_SVT_TESTREPO is ${IS_SVT_TESTREPO}"/>
 		<condition property="isSVTTestRepo" value="true" else="false">
 			<and>
 				<isset property="IS_SVT_TESTREPO"/>
