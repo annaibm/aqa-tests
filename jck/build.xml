@@ -331,6 +331,7 @@
 									<equals arg1="${JDK_VERSION}" arg2="17" />
 									<then>
 										<property name="JCK_VERSION_USED" value="jck17a" />
+										<echo>=== gettttt is set to ${JCK_VERSION_USED} ===</echo>
 									</then>
 									<else>
 										<property name="JCK_VERSION_USED" value="jck${JDK_VERSION}" />
@@ -342,6 +343,7 @@
 				</if>
 			</else>
 		</if>
+		<echo>=== gettttt is set to ${JCK_VERSION_USED} ===</echo>
 		<echo>=== JCK_VERSION_USED is set to ${JCK_VERSION_USED} ===</echo>
 
 		<propertyregex property="jck_short_version" input="${JCK_VERSION_USED}" regexp="jck([^\.]*)" select="\1" casesensitive="false" />
