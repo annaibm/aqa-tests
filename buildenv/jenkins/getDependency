@@ -17,9 +17,9 @@ def testBuild() {
 	timeout(time: time_limit, unit: 'HOURS') {
 		try {
 			if( params.BUILD_TYPE == "systemtest" ){
-				sh 'curl -OLJks "https://api.adoptopenjdk.net/v3/binary/latest/8/ga/linux/x64/jdk/hotspot/normal/adoptopenjdk"'
+				sh 'curl -OLJks "https://api.adoptopenjdk.net/v3/binary/latest/17/ga/linux/x64/jdk/hotspot/normal/adoptopenjdk"'
 				sh 'mkdir ${WORKSPACE}/j2sdk-image'
-				sh 'tar -xzf OpenJDK8U-jdk_x64_linux_hotspot*.gz -C ${WORKSPACE}/j2sdk-image --strip-components 1'
+				sh 'tar -xzf OpenJDK17U-jdk_x64_linux_hotspot*.gz -C ${WORKSPACE}/j2sdk-image --strip-components 1'
 				sh '${WORKSPACE}/j2sdk-image/jre/bin/java -version'
 				sh 'git clone --branch mauveDebug --single-branch https://github.com/annaibm/aqa-systemtest.git'
 				sh 'git clone https://github.com/adoptium/STF'
