@@ -1070,7 +1070,8 @@ def getJenkinsDomain() {
 def getCustomUrl() {
 	def jenkinsDomain = getJenkinsDomain()
 	if (jenkinsDomain.contains("hyc-runtimes")) {
-		jenkinsDomain = "openj9-jenkins.osuosl.org"
+		//just to debug and test
+		//jenkinsDomain = "openj9-jenkins.osuosl.org"
 	} else if (jenkinsDomain.contains("temurin-compliance")) {
                 jenkinsDomain = "ci.adoptium.net"
         }
