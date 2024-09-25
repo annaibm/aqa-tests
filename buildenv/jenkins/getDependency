@@ -21,7 +21,7 @@ def testBuild() {
 				sh 'mkdir ${WORKSPACE}/j2sdk-image'
 				sh 'tar -xzf OpenJDK17U-jdk_x64_linux_hotspot*.gz -C ${WORKSPACE}/j2sdk-image --strip-components 1'
 				sh '${WORKSPACE}/j2sdk-image/bin/java -version'
-				sh 'git clone --branch master --single-branch https://github.com/fridrich/aqa-systemtest.git'
+				sh 'git clone https://github.com/adoptium/aqa-systemtest'
 				sh 'git clone https://github.com/adoptium/STF'
 				sh 'ant -f ./aqa-systemtest/openjdk.build/build.xml -Djava.home=${WORKSPACE}/j2sdk-image -Dprereqs_root=${WORKSPACE}/systemtest_prereqs configure'
 				sh 'ant -f ./aqa-systemtest/openjdk.test.mauve/build.xml -Djava.home=${WORKSPACE}/j2sdk-image -Dprereqs_root=${WORKSPACE}/systemtest_prereqs configure'
