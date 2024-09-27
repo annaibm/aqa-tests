@@ -1075,7 +1075,7 @@ def getCustomUrl() {
                 jenkinsDomain = "ci.adoptium.net"
         }
 
-	def customUrl = "https://${jenkinsDomain}/job/test.getDependency/162/artifact/"
+	def customUrl = "https://${jenkinsDomain}/job/test.getDependency/141/artifact/"
 	echo "Custom URL: ${customUrl}"
 	return customUrl
 }
