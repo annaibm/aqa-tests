@@ -346,6 +346,8 @@ def genParallelList(PARALLEL_OPTIONS) {
 			echo 'Converting parallelList.mk file from ebcdic to ascii...'
 			sh "iconv -f ibm-1047 -t iso8859-1 ${parallelList} > ${parallelList}.ascii; rm ${parallelList}; mv ${parallelList}.ascii ${parallelList}"
 		}
+		echo "Contents of parallelList.mk:"
+        sh "cat ${parallelList}"
 		echo "read parallelList.mk file: ${parallelList}"
 		def properties = readProperties file: "${parallelList}"
 		if (properties.NUM_LIST) {
