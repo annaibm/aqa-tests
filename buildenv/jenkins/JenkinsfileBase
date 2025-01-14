@@ -342,6 +342,8 @@ def genParallelList(PARALLEL_OPTIONS) {
 	def parallelList = "aqa-tests/TKG/parallelList.mk"
 	int NUM_LIST = -1
 	if (fileExists("${parallelList}")) {
+		echo "Contents of parallelList.mk:"
+        sh "cat ${parallelList}"
 		if (SPEC.startsWith('zos')) {
 			echo 'Converting parallelList.mk file from ebcdic to ascii...'
 			sh "iconv -f ibm-1047 -t iso8859-1 ${parallelList} > ${parallelList}.ascii; rm ${parallelList}; mv ${parallelList}.ascii ${parallelList}"
