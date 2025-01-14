@@ -346,10 +346,18 @@ def genParallelList(PARALLEL_OPTIONS) {
         sh "cat ${parallelList}"
 		if (SPEC.startsWith('zos')) {
 			echo 'Converting parallelList.mk file from ebcdic to ascii...'
-			sh "iconv -f ibm-1047 -t iso8859-1 ${parallelList} > ${parallelList}.ascii; rm ${parallelList}; mv ${parallelList}.ascii ${parallelList}"
+			sh "iconv -f ibm-1047 -t iso8859-1 ${parallelList} > ${parallelList}.ascii"
+        
+        	echo "Contents of the converted parallelList.mk.ascii:"
+        	sh "cat ${parallelList}.ascii"
+
+        	// Remove original file and rename converted one
+       		sh "rm ${parallelList}"
+        	sh "mv ${parallelList}.ascii ${parallelList}"
+        
+        	echo "Conversion completed, contents of parallelList.mk after conversion:"
+        	sh "cat ${parallelList}"
 		}
-		echo "Contents of parallelList.mk:"
-        sh "cat ${parallelList}"
 		echo "read parallelList.mk file: ${parallelList}"
 		def properties = readProperties file: "${parallelList}"
 		if (properties.NUM_LIST) {
