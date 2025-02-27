@@ -4,7 +4,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-     https://www.apache.org/licenses/LICENSE-2.0
+	 https://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,13 +15,13 @@ limitations under the License.
 <playlist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../TKG/resources/playlist.xsd">
 	<test>
 		<testCaseName>MBCS_Tests_unicode_linux</testCaseName>
-        <disables>
+		<disables>
 			<disable>
 				<comment>https://github.com/eclipse-openj9/openj9/issues/21187</comment>
 				<platform>aarch64_linux.*</platform>
-                <version>24</version>
+				<version>24</version>
 			</disable>
-         </disables>   
+		 </disables>   
 		<command>$(RUN_SCRIPT) $(TEST_RESROOT)$(D)test.sh; \
 	$(TEST_STATUS)</command>
 		<platformRequirements>os.linux</platformRequirements>
