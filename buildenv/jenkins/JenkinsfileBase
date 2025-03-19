@@ -52,7 +52,7 @@ def setupEnv() {
 	if(!params.USE_TESTENV_PROPERTIES){
 		env.ADOPTOPENJDK_REPO = params.ADOPTOPENJDK_REPO ? params.ADOPTOPENJDK_REPO : "https://github.com/adoptium/aqa-tests.git"
 		def OPENJ9_REPO = params.OPENJ9_REPO ? params.OPENJ9_REPO : "https://github.com/eclipse-openj9/openj9.git"
-		def tkg = getGitRepoBranch(params.TKG_OWNER_BRANCH, "adoptium:master", "TKG")
+		String tkg = getGitRepoBranch(params.TKG_OWNER_BRANCH, "adoptium:master", "TKG")
 		def TKG_REPO = tkg[0]
 		def TKG_BRANCH = tkg[1]
 		//For Zos, the right repo should be something like: git@github.ibm.com:runtimes/openj9-openjdk-jdk**-zos.git and for now there is only jdk11
