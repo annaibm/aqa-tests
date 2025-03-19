@@ -52,7 +52,7 @@ def setupEnv() {
 	if(!params.USE_TESTENV_PROPERTIES){
 		env.ADOPTOPENJDK_REPO = params.ADOPTOPENJDK_REPO ? params.ADOPTOPENJDK_REPO : "https://github.com/adoptium/aqa-tests.git"
 		def OPENJ9_REPO = params.OPENJ9_REPO ? params.OPENJ9_REPO : "https://github.com/eclipse-openj9/openj9.git"
-		String tkg = getGitRepoBranch(params.TKG_OWNER_BRANCH, "adoptium:master", "TKG")
+		String[] tkg = getGitRepoBranch(params.TKG_OWNER_BRANCH, "adoptium:master", "TKG")
 		def TKG_REPO = tkg[0]
 		def TKG_BRANCH = tkg[1]
 		//For Zos, the right repo should be something like: git@github.ibm.com:runtimes/openj9-openjdk-jdk**-zos.git and for now there is only jdk11
@@ -471,12 +471,12 @@ def setup() {
 				}
 			}
 		}
-		OPENJ9_REPO_OPTION = ""
-		OPENJ9_BRANCH_OPTION = ""
-		TKG_REPO_OPTION = ""
-		TKG_BRANCH_OPTION = ""
-		OPENJ9_SHA_OPTION = ""
-		CLONE_OPENJ9_OPTION = (params.CLONE_OPENJ9) ? "--clone_openj9 ${params.CLONE_OPENJ9}" : ""
+		def OPENJ9_REPO_OPTION = ""
+		def OPENJ9_BRANCH_OPTION = ""
+		def TKG_REPO_OPTION = ""
+		def TKG_BRANCH_OPTION = ""
+		def OPENJ9_SHA_OPTION = ""
+		def CLONE_OPENJ9_OPTION = (params.CLONE_OPENJ9) ? "--clone_openj9 ${params.CLONE_OPENJ9}" : ""
 		// if CLONE_OPENJ9 parameter is not set, only clone openj9 if we are running functional tests
 		if (CLONE_OPENJ9_OPTION == "") {
 			if (env.BUILD_LIST.contains('functional')) {
@@ -493,8 +493,8 @@ def setup() {
 				CLONE_OPENJ9_OPTION = "--clone_openj9 false"
 			}
 		}
-		JDK_VERSION_OPTION = env.JDK_VERSION ? "-j ${env.JDK_VERSION}" : ""
-		JDK_IMPL_OPTION = env.JDK_IMPL ? "-i ${env.JDK_IMPL}" : ""
+		def JDK_VERSION_OPTION = env.JDK_VERSION ? "-j ${env.JDK_VERSION}" : ""
+		def JDK_IMPL_OPTION = env.JDK_IMPL ? "-i ${env.JDK_IMPL}" : ""
 
 		// system test repository exports to be used by system/common.xml
 		if(!params.USE_TESTENV_PROPERTIES){
@@ -515,23 +515,23 @@ def setup() {
 		}
 		// vendor test
 		// expect VENDOR_TEST_* to be comma separated string parameters
-		VENDOR_TEST_REPOS = (params.VENDOR_TEST_REPOS) ? "--vendor_repos \"${params.VENDOR_TEST_REPOS}\"" : ""
-		VENDOR_TEST_BRANCHES = (params.VENDOR_TEST_BRANCHES) ? "--vendor_branches \"${params.VENDOR_TEST_BRANCHES}\"" : ""
-		VENDOR_TEST_DIRS = (params.VENDOR_TEST_DIRS) ? "--vendor_dirs \"${params.VENDOR_TEST_DIRS}\"" : ""
-		VENDOR_TEST_SHAS = (params.VENDOR_TEST_SHAS) ? "--vendor_shas \"${params.VENDOR_TEST_SHAS}\"" : ""
+		def VENDOR_TEST_REPOS = (params.VENDOR_TEST_REPOS) ? "--vendor_repos \"${params.VENDOR_TEST_REPOS}\"" : ""
+		def VENDOR_TEST_BRANCHES = (params.VENDOR_TEST_BRANCHES) ? "--vendor_branches \"${params.VENDOR_TEST_BRANCHES}\"" : ""
+		def VENDOR_TEST_DIRS = (params.VENDOR_TEST_DIRS) ? "--vendor_dirs \"${params.VENDOR_TEST_DIRS}\"" : ""
+		def VENDOR_TEST_SHAS = (params.VENDOR_TEST_SHAS) ? "--vendor_shas \"${params.VENDOR_TEST_SHAS}\"" : ""
 		env.IS_SVT_TESTREPO = (params.VENDOR_TEST_REPOS && params.VENDOR_TEST_REPOS.contains('SVTTestRepo')) ? true : false
 		echo "IS_SVT_TESTREPO is set to ${env.IS_SVT_TESTREPO}"
 
 		// handle three cases (true/false/null) in params.TEST_IMAGES_REQUIRED and params.DEBUG_IMAGES_REQUIRED
 		// Only set image required to false if params is set to false. In get.sh, the default value is true
-		TEST_IMAGES_REQUIRED = (params.TEST_IMAGES_REQUIRED == false) ? "--test_images_required false" : ""
-		DEBUG_IMAGES_REQUIRED = (params.DEBUG_IMAGES_REQUIRED == false) ? "--debug_images_required false" : ""
-		CODE_COVERAGE_OPTION = params.CODE_COVERAGE ? "--code_coverage true" : ""
-		ADDITIONAL_ARTIFACTS_REQUIRED_OPTION = (params.ADDITIONAL_ARTIFACTS_REQUIRED) ? "--additional_artifacts_required ${params.ADDITIONAL_ARTIFACTS_REQUIRED}" : ""
+		def TEST_IMAGES_REQUIRED = (params.TEST_IMAGES_REQUIRED == false) ? "--test_images_required false" : ""
+		def DEBUG_IMAGES_REQUIRED = (params.DEBUG_IMAGES_REQUIRED == false) ? "--debug_images_required false" : ""
+		def CODE_COVERAGE_OPTION = params.CODE_COVERAGE ? "--code_coverage true" : ""
+		def ADDITIONAL_ARTIFACTS_REQUIRED_OPTION = (params.ADDITIONAL_ARTIFACTS_REQUIRED) ? "--additional_artifacts_required ${params.ADDITIONAL_ARTIFACTS_REQUIRED}" : ""
 
-		CURL_OPTS = (params.CURL_OPTS) ? "--curl_opts \"${params.CURL_OPTS}\"" : ""
-		GET_SH_CMD = "./get.sh -s `pwd`/.. -p $PLATFORM -r ${SDK_RESOURCE} ${JDK_VERSION_OPTION} ${JDK_IMPL_OPTION} ${CUSTOMIZED_SDK_URL_OPTION} ${CLONE_OPENJ9_OPTION} ${OPENJ9_REPO_OPTION} ${OPENJ9_BRANCH_OPTION} ${OPENJ9_SHA_OPTION} ${TKG_REPO_OPTION} ${TKG_BRANCH_OPTION} ${VENDOR_TEST_REPOS} ${VENDOR_TEST_BRANCHES} ${VENDOR_TEST_DIRS} ${VENDOR_TEST_SHAS} ${TEST_IMAGES_REQUIRED} ${DEBUG_IMAGES_REQUIRED} ${CODE_COVERAGE_OPTION} ${CURL_OPTS} ${ADDITIONAL_ARTIFACTS_REQUIRED_OPTION}"
-		RESOLVED_MAKE = "if [ `uname` = AIX ] || [ `uname` = SunOS ] || [ `uname` = *BSD ]; then MAKE=gmake; else MAKE=make; fi"
+		def CURL_OPTS = (params.CURL_OPTS) ? "--curl_opts \"${params.CURL_OPTS}\"" : ""
+		def GET_SH_CMD = "./get.sh -s `pwd`/.. -p $PLATFORM -r ${SDK_RESOURCE} ${JDK_VERSION_OPTION} ${JDK_IMPL_OPTION} ${CUSTOMIZED_SDK_URL_OPTION} ${CLONE_OPENJ9_OPTION} ${OPENJ9_REPO_OPTION} ${OPENJ9_BRANCH_OPTION} ${OPENJ9_SHA_OPTION} ${TKG_REPO_OPTION} ${TKG_BRANCH_OPTION} ${VENDOR_TEST_REPOS} ${VENDOR_TEST_BRANCHES} ${VENDOR_TEST_DIRS} ${VENDOR_TEST_SHAS} ${TEST_IMAGES_REQUIRED} ${DEBUG_IMAGES_REQUIRED} ${CODE_COVERAGE_OPTION} ${CURL_OPTS} ${ADDITIONAL_ARTIFACTS_REQUIRED_OPTION}"
+		def RESOLVED_MAKE = "if [ `uname` = AIX ] || [ `uname` = SunOS ] || [ `uname` = *BSD ]; then MAKE=gmake; else MAKE=make; fi"
 		dir( WORKSPACE) {
 			// use sshagent with Jenkins credentials ID for all platforms except zOS
 			// on zOS use the user's ssh key
