@@ -2,13 +2,11 @@
 
 def JDK_VERSIONS = params.JDK_VERSIONS.trim().split("\\s*,\\s*")
 def PLATFORMS = params.PLATFORMS.trim().split("\\s*,\\s*")
-def TARGETS = params.TARGETS ?: "Grinder"
-TARGETS = TARGETS.trim().split("\\s*,\\s*")
+def TARGETS = (params.TARGETS ?: "Grinder").trim().split("\\s*,\\s*")
 def TEST_FLAG = (params.TEST_FLAG) ?: ""
-
 def PARALLEL = params.PARALLEL ? params.PARALLEL : "Dynamic"
 
-NUM_MACHINES = ""
+def NUM_MACHINES = ""
 if (params.NUM_MACHINES) {
     NUM_MACHINES = params.NUM_MACHINES
 } else if (!params.TEST_TIME && PARALLEL == "Dynamic") {
@@ -16,11 +14,11 @@ if (params.NUM_MACHINES) {
     NUM_MACHINES = 3
 }
 
-SDK_RESOURCE = params.SDK_RESOURCE ? params.SDK_RESOURCE : "releases"
-TIME_LIMIT = params.TIME_LIMIT ? params.TIME_LIMIT : 10
-AUTO_AQA_GEN = params.AUTO_AQA_GEN ? params.AUTO_AQA_GEN.toBoolean() : false
-TRSS_URL = params.TRSS_URL ? params.TRSS_URL : "https://trss.adoptium.net/"
-LIGHT_WEIGHT_CHECKOUT = params.LIGHT_WEIGHT_CHECKOUT ?: false
+def SDK_RESOURCE = params.SDK_RESOURCE ? params.SDK_RESOURCE : "releases"
+def TIME_LIMIT = params.TIME_LIMIT ? params.TIME_LIMIT : 10
+def def AUTO_AQA_GEN = params.AUTO_AQA_GEN ? params.AUTO_AQA_GEN.toBoolean() : false
+def TRSS_URL = params.TRSS_URL ? params.TRSS_URL : "https://trss.adoptium.net/"
+def LIGHT_WEIGHT_CHECKOUT = params.LIGHT_WEIGHT_CHECKOUT ?: false
 
 // Use BUILD_USER_ID if set and jdk-JDK_VERSIONS
 def DEFAULT_SUFFIX = (env.BUILD_USER_ID) ? "${env.BUILD_USER_ID} - jdk-${params.JDK_VERSIONS}" : "jdk-${params.JDK_VERSIONS}"
@@ -29,10 +27,10 @@ def PIPELINE_DISPLAY_NAME = (params.PIPELINE_DISPLAY_NAME) ? "#${currentBuild.nu
 // Set the AQA_TEST_PIPELINE Jenkins job displayName
 currentBuild.setDisplayName(PIPELINE_DISPLAY_NAME)
 
-defaultTestTargets = "sanity.functional,extended.functional,special.functional,sanity.openjdk,extended.openjdk,special.openjdk,sanity.system,extended.system,special.system,sanity.perf,extended.perf,sanity.jck,extended.jck,special.jck"
-defaultFipsTestTargets = "extended.functional,sanity.openjdk,extended.openjdk,sanity.jck,extended.jck,special.jck"
+def defaultTestTargets = "sanity.functional,extended.functional,special.functional,sanity.openjdk,extended.openjdk,special.openjdk,sanity.system,extended.system,special.system,sanity.perf,extended.perf,sanity.jck,extended.jck,special.jck"
+def defaultFipsTestTargets = "extended.functional,sanity.openjdk,extended.openjdk,sanity.jck,extended.jck,special.jck"
 // There is no applicable tests for FIPS140-2 extended.functional atm, so temporarily disable FIPS140-2 extended.functional
-defaultFips140_2TestTargets = defaultFipsTestTargets.replace("extended.functional,", "")
+def defaultFips140_2TestTargets = defaultFipsTestTargets.replace("extended.functional,", "")
 
 if (params.BUILD_TYPE == "nightly") {
     defaultTestTargets = "sanity.functional,extended.functional,sanity.openjdk,extended.openjdk,sanity.perf,sanity.jck,sanity.system,special.system"

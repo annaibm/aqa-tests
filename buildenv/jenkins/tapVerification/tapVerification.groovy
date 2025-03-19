@@ -16,7 +16,7 @@ timestamps{
     currentBuild.setDisplayName(PIPELINE_DISPLAY_NAME)
     node(LABEL) {
         cleanWs disableDeferredWipeout: true, deleteDirs: true
-        TIME_LIMIT =  params.TIME_LIMIT ? params.TIME_LIMIT.toInteger() : 1
+        def TIME_LIMIT =  params.TIME_LIMIT ? params.TIME_LIMIT.toInteger() : 1
         timeout(time: TIME_LIMIT, unit: 'HOURS') {
             // change openjdk-tests to aqa-tests
             sh "curl -Os https://raw.githubusercontent.com/${AQA_REPO}/aqa-tests/${AQA_BRANCH}/buildenv/jenkins/tapVerification/aqaTap.sh"

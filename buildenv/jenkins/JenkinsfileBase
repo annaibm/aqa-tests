@@ -53,8 +53,8 @@ def setupEnv() {
 		env.ADOPTOPENJDK_REPO = params.ADOPTOPENJDK_REPO ? params.ADOPTOPENJDK_REPO : "https://github.com/adoptium/aqa-tests.git"
 		def OPENJ9_REPO = params.OPENJ9_REPO ? params.OPENJ9_REPO : "https://github.com/eclipse-openj9/openj9.git"
 		String[] tkg = getGitRepoBranch(params.TKG_OWNER_BRANCH, "adoptium:master", "TKG")
-		TKG_REPO = tkg[0]
-		TKG_BRANCH = tkg[1]
+		env.TKG_REPO = tkg[0]
+		env.TKG_BRANCH = tkg[1]
 		//For Zos, the right repo should be something like: git@github.ibm.com:runtimes/openj9-openjdk-jdk**-zos.git and for now there is only jdk11
 		env.JDK_REPO = params.JDK_REPO ? params.JDK_REPO : ""
 		if (env.SPEC.startsWith('zos')) {
@@ -979,7 +979,7 @@ def post(output_name) {
 }
 
 def testBuild() {
-	TIME_LIMIT = params.TIME_LIMIT ? params.TIME_LIMIT.toInteger() : 10
+	def TIME_LIMIT = params.TIME_LIMIT ? params.TIME_LIMIT.toInteger() : 10
 	timeout(time: TIME_LIMIT, unit: 'HOURS') {
 		try {
 			addJobDescription()
