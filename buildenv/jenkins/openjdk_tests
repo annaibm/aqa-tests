@@ -276,7 +276,6 @@ timestamps{
                 dockerAgents = PLATFORM_MAP[params.PLATFORM]["DockerAgents"] ? PLATFORM_MAP[params.PLATFORM]["DockerAgents"] : []
             }
             dockerAgentLabel = ''
-            def LABEL = null
             if (params.LABEL) {
                 LABEL = params.LABEL
             } else {
