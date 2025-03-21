@@ -124,7 +124,6 @@ if ( !params.TARGET ) {
 def PLATFORMS = params.PLATFORM.trim().split("\\s*,\\s*");
 def JDK_VERSIONS = params.JDK_VERSION.trim().split("\\s*,\\s*");
 def JDK_IMPLS = params.JDK_IMPL.trim().split("\\s*,\\s*");
-def LABEL = '';
 // if multiple JDK_VERSION / JDK_IMPL / PLATFORM are provided, run test jobs in parallel
 timestamps{
     if (JDK_VERSIONS.size() > 1 || JDK_IMPLS.size() > 1 || PLATFORMS.size() >1 || PLATFORMS.any { it.contains("all") }) {
@@ -277,6 +276,7 @@ timestamps{
                 dockerAgents = PLATFORM_MAP[params.PLATFORM]["DockerAgents"] ? PLATFORM_MAP[params.PLATFORM]["DockerAgents"] : []
             }
             dockerAgentLabel = ''
+            def LABEL = null
             if (params.LABEL) {
                 LABEL = params.LABEL
             } else {
