@@ -276,6 +276,7 @@ timestamps{
             } else {
                 dockerAgents = PLATFORM_MAP[params.PLATFORM]["DockerAgents"] ? PLATFORM_MAP[params.PLATFORM]["DockerAgents"] : []
             }
+            dockerAgentLabel = ''
             if (params.LABEL) {
                 LABEL = params.LABEL
             } else {
