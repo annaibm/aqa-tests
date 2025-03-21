@@ -276,7 +276,6 @@ timestamps{
             } else {
                 dockerAgents = PLATFORM_MAP[params.PLATFORM]["DockerAgents"] ? PLATFORM_MAP[params.PLATFORM]["DockerAgents"] : []
             }
-            dockerAgentLabel = ''
             if (params.LABEL) {
                 LABEL = params.LABEL
             } else {
@@ -355,6 +354,7 @@ timestamps{
                             }
                         }
                         if (!isNodeIdle) {
+                            def dockerAgentLabel = ''
                             // DynamicAgents and DockerAgents shouldn't contain the same label
                             if (params.CLOUD_PROVIDER != null && params.CLOUD_PROVIDER in dynamicAgents) {
                                 LABEL = LABEL.minus("ci.role.test&&")
