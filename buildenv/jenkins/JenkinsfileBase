@@ -972,9 +972,6 @@ def post(output_name) {
 
 		try {
 			junit allowEmptyResults: true, keepLongStdio: true, testResults: '**/work/**/*.jtr.xml, **/result/**/*.jtr.xml, **/junitreports/**/*.xml, **/external_test_reports/**/*.xml'
-            // Access test results
-            def testResults = currentBuild.rawBuild.getAction(hudson.tasks.test.TestResultAction)
-            
             def testReports = findFiles(glob: '**/junitreports/**/*.xml')
 
             if (testReports.length > 0) {
