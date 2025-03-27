@@ -972,9 +972,43 @@ def post(output_name) {
 
 		try {
 			junit allowEmptyResults: true, keepLongStdio: true, testResults: '**/work/**/*.jtr.xml, **/result/**/*.jtr.xml, **/junitreports/**/*.xml, **/external_test_reports/**/*.xml'
-		} catch (Exception e) {
-			echo "Caught exception: ${e.message}"
-		}
+            // Access test results
+            def testResults = currentBuild.rawBuild.getAction(hudson.tasks.test.TestResultAction)
+            
+            if (testResults != null) {
+                // Print summary of test results
+                def failedTests = testResults.getFailedTests()
+                def passedTests = testResults.getPassedTests()
+                def skippedTests = testResults.getSkippedTests()
+
+                echo "Test Results Summary:"
+                echo "Total Tests: ${testResults.getTotalCount()}"
+                echo "Passed Tests: ${passedTests.size()}"
+                echo "Failed Tests: ${failedTests.size()}"
+                echo "Skipped Tests: ${skippedTests.size()}"
+
+                // Optionally, print out the names of failed tests
+                if (failedTests.size() > 0) {
+                    echo "Failed Test Names:"
+                    failedTests.each { test ->
+                        echo " - ${test.getDisplayName()}"
+                    }
+                }
+
+                // Mark the build as unstable if there are failures
+                if (failedTests.size() > 0) {
+                    currentBuild.result = 'UNSTABLE'
+                    echo "Some tests have failed. Marking build as unstable."
+                } else {
+                    echo "All tests passed. Build is stable."
+                }
+            } else {
+                echo "No test results found."
+            }
+            } catch (Exception e) {
+                echo "Caught exception: ${e.message}"
+                currentBuild.result = 'FAILURE'  // Set the build result to FAILURE in case of an error
+            }
 	}
 }
 
