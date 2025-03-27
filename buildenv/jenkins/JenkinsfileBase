@@ -972,20 +972,23 @@ def post(output_name) {
 
 		try {
 			junit allowEmptyResults: true, keepLongStdio: true, testResults: '**/work/**/*.jtr.xml, **/result/**/*.jtr.xml, **/junitreports/**/*.xml, **/external_test_reports/**/*.xml'
-            def testReports = findFiles(glob: '**/junitreports/**/*.xml')
+          // Debug: List test report files
+            sh "ls -R work result junitreports external_test_reports || true"
+
+            def testReports = findFiles(glob: '**/work/**/*.jtr.xml, **/result/**/*.jtr.xml, **/junitreports/**/*.xml, **/external_test_reports/**/*.xml')
+            echo "🔍 Found test reports: ${testReports*.path.join(', ')}"
 
             if (testReports.length > 0) {
-                // Check how many failures exist in the test reports
-                def failedTests = sh(script: "grep -c '<failure>' **/junitreports/**/*.xml || true", returnStdout: true).trim()
+                def failedTests = sh(script: "grep -c '<failure>' ${testReports[0].path} || true", returnStdout: true).trim()
                 
                 if (failedTests.toInteger() > 0) {
-                    echo "Found ${failedTests} failed tests. Marking build as UNSTABLE."
+                    echo "🚨 Found ${failedTests} failed tests. Marking build as UNSTABLE."
                     currentBuild.result = 'UNSTABLE'
                 } else {
-                    echo "No failed tests found."
+                    echo "✅ No failed tests found."
                 }
             } else {
-                echo "No test reports found. Check if tests ran correctly."
+                echo "⚠️ No test reports found! Check if tests ran correctly."
             }
             } catch (Exception e) {
                 echo "Caught exception: ${e.message}"
