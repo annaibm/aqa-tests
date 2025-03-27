@@ -975,35 +975,20 @@ def post(output_name) {
             // Access test results
             def testResults = currentBuild.rawBuild.getAction(hudson.tasks.test.TestResultAction)
             
-            if (testResults != null) {
-                // Print summary of test results
-                def failedTests = testResults.getFailedTests()
-                def passedTests = testResults.getPassedTests()
-                def skippedTests = testResults.getSkippedTests()
+            def testReports = findFiles(glob: '**/junitreports/**/*.xml')
 
-                echo "Test Results Summary:"
-                echo "Total Tests: ${testResults.getTotalCount()}"
-                echo "Passed Tests: ${passedTests.size()}"
-                echo "Failed Tests: ${failedTests.size()}"
-                echo "Skipped Tests: ${skippedTests.size()}"
-
-                // Optionally, print out the names of failed tests
-                if (failedTests.size() > 0) {
-                    echo "Failed Test Names:"
-                    failedTests.each { test ->
-                        echo " - ${test.getDisplayName()}"
-                    }
-                }
-
-                // Mark the build as unstable if there are failures
-                if (failedTests.size() > 0) {
+            if (testReports.length > 0) {
+                // Check how many failures exist in the test reports
+                def failedTests = sh(script: "grep -c '<failure>' **/junitreports/**/*.xml || true", returnStdout: true).trim()
+                
+                if (failedTests.toInteger() > 0) {
+                    echo "Found ${failedTests} failed tests. Marking build as UNSTABLE."
                     currentBuild.result = 'UNSTABLE'
-                    echo "Some tests have failed. Marking build as unstable."
                 } else {
-                    echo "All tests passed. Build is stable."
+                    echo "No failed tests found."
                 }
             } else {
-                echo "No test results found."
+                echo "No test reports found. Check if tests ran correctly."
             }
             } catch (Exception e) {
                 echo "Caught exception: ${e.message}"
