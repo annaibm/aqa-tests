@@ -993,13 +993,17 @@ def post(output_name) {
 				}
 			}
 			
-			echo "Found test reports: ${testReports.collect { it.path }.join(', ')}"
+			// Build a list of file paths manually
+			def filePaths = []
+			for (file in testReports) {
+				filePaths << file.path
+			}
+			echo "Found test reports: ${filePaths.join(', ')}"
 			
 			if (testReports.size() == 0) {
 				echo "No test reports found! Verify test execution and paths."
 			} else {
 				echo "Processing ${testReports.size()} test reports."
-				
 				int totalFailedTests = 0
 				for (file in testReports) {
 					def failedTests = sh(script: "grep -c '<failure>' ${file.path} || true", returnStdout: true).trim()
@@ -1012,7 +1016,6 @@ def post(output_name) {
 				} else {
 					echo "No failed tests found."
 				}
-			}
             } catch (Exception e) {
                 echo "Caught exception: ${e.message}"
                 currentBuild.result = 'FAILURE'  // Set the build result to FAILURE in case of an error
