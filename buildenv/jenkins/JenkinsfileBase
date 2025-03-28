@@ -971,8 +971,8 @@ def post(output_name) {
 		addFailedTestsGrinderLink()
 
 		try {
-			junit allowEmptyResults: true, keepLongStdio: true, testResults: '**/work/**/*.jtr.xml, **/result/**/*.jtr.xml, **/junitreports/**/*.xml, **/external_test_reports/**/*.xml'
-
+			def a = junit allowEmptyResults: true, keepLongStdio: true, testResults: '**/work/**/*.jtr.xml, **/result/**/*.jtr.xml, **/junitreports/**/*.xml, **/external_test_reports/**/*.xml'
+			echo "Junit var a: ${a}" 
 			// Debug: List test result files
 			sh "ls -R work result junitreports external_test_reports || true"
 
