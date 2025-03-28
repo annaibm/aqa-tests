@@ -976,32 +976,43 @@ def post(output_name) {
                 // Debug: List test result files
 				sh "ls -R work result junitreports external_test_reports || true"
 
-				// Use multiple findFiles calls and combine results
 				def testReports = []
-				testReports += findFiles(glob: '**/work/**/*.jtr.xml')
-				testReports += findFiles(glob: '**/result/**/*.jtr.xml')
-				testReports += findFiles(glob: '**/junitreports/**/*.xml')
-				testReports += findFiles(glob: '**/external_test_reports/**/*.xml')
-				
-				echo "Found test reports: ${testReports.collect { it.path }.join(', ')}"
-
-				if (testReports.size() == 0) {
-					echo "No test reports found! Verify test execution and paths."
+			def patterns = [
+				'**/work/**/*.jtr.xml',
+				'**/result/**/*.jtr.xml',
+				'**/junitreports/**/*.xml',
+				'**/external_test_reports/**/*.xml'
+			]
+			
+			patterns.each { pattern ->
+				def foundFiles = findFiles(glob: pattern)
+				if (foundFiles != null && foundFiles.size() > 0) {
+					testReports += foundFiles
 				} else {
-					echo "Processing ${testReports.size()} test reports."
-					int totalFailedTests = 0
-					for (file in testReports) {
-						def failedTests = sh(script: "grep -c '<failure>' ${file.path} || true", returnStdout: true).trim()
-						totalFailedTests += failedTests.toInteger()
-					}
-
-					if (totalFailedTests > 0) {
-						echo "Found ${totalFailedTests} failed tests. Marking build as UNSTABLE."
-						currentBuild.result = 'UNSTABLE'
-					} else {
-						echo "No failed tests found."
-					}
+					echo "No files found for pattern: ${pattern}"
 				}
+			}
+			
+			echo "Found test reports: ${testReports.collect { it.path }.join(', ')}"
+			
+			if (testReports.size() == 0) {
+				echo "No test reports found! Verify test execution and paths."
+			} else {
+				echo "Processing ${testReports.size()} test reports."
+				
+				int totalFailedTests = 0
+				for (file in testReports) {
+					def failedTests = sh(script: "grep -c '<failure>' ${file.path} || true", returnStdout: true).trim()
+					totalFailedTests += failedTests.toInteger()
+				}
+				
+				if (totalFailedTests > 0) {
+					echo "Found ${totalFailedTests} failed tests. Marking build as UNSTABLE."
+					currentBuild.result = 'UNSTABLE'
+				} else {
+					echo "No failed tests found."
+				}
+			}
             } catch (Exception e) {
                 echo "Caught exception: ${e.message}"
                 currentBuild.result = 'FAILURE'  // Set the build result to FAILURE in case of an error
