@@ -971,19 +971,19 @@ def post(output_name) {
 		addFailedTestsGrinderLink()
 
 		try {
-			    junit allowEmptyResults: true, keepLongStdio: true, testResults: '**/work/**/*.jtr.xml, **/result/**/*.jtr.xml, **/junitreports/**/*.xml, **/external_test_reports/**/*.xml'
-            
-                // Debug: List test result files
-				sh "ls -R work result junitreports external_test_reports || true"
+			junit allowEmptyResults: true, keepLongStdio: true, testResults: '**/work/**/*.jtr.xml, **/result/**/*.jtr.xml, **/junitreports/**/*.xml, **/external_test_reports/**/*.xml'
 
-				def testReports = []
+			// Debug: List test result files
+			sh "ls -R work result junitreports external_test_reports || true"
+
+			def testReports = []
 			def patterns = [
 				'**/work/**/*.jtr.xml',
 				'**/result/**/*.jtr.xml',
 				'**/junitreports/**/*.xml',
 				'**/external_test_reports/**/*.xml'
 			]
-			
+
 			patterns.each { pattern ->
 				def foundFiles = findFiles(glob: pattern)
 				if (foundFiles != null && foundFiles.size() > 0) {
@@ -992,14 +992,14 @@ def post(output_name) {
 					echo "No files found for pattern: ${pattern}"
 				}
 			}
-			
+
 			// Build a list of file paths manually
 			def filePaths = []
 			for (file in testReports) {
 				filePaths << file.path
 			}
 			echo "Found test reports: ${filePaths.join(', ')}"
-			
+
 			if (testReports.size() == 0) {
 				echo "No test reports found! Verify test execution and paths."
 			} else {
@@ -1009,17 +1009,18 @@ def post(output_name) {
 					def failedTests = sh(script: "grep -c '<failure>' ${file.path} || true", returnStdout: true).trim()
 					totalFailedTests += failedTests.toInteger()
 				}
-				
+
 				if (totalFailedTests > 0) {
 					echo "Found ${totalFailedTests} failed tests. Marking build as UNSTABLE."
 					currentBuild.result = 'UNSTABLE'
 				} else {
 					echo "No failed tests found."
 				}
-            } catch (Exception e) {
-                echo "Caught exception: ${e.message}"
-                currentBuild.result = 'FAILURE'  // Set the build result to FAILURE in case of an error
-            }
+			}
+			} catch (Exception e) {
+				echo "Caught exception: ${e.message}"
+				currentBuild.result = 'FAILURE'  // Set the build result to FAILURE in case of an error
+			}
 	}
 }
 
