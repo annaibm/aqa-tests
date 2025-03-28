@@ -988,6 +988,7 @@ def post(output_name) {
 			echo "Caught exception: ${e.message}"
 			currentBuild.result = 'FAILURE'  // Set the build result to FAILURE in case of an error
 		}
+	}	
 }
 
 def testBuild() {
