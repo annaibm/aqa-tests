@@ -993,35 +993,36 @@ def post(output_name) {
 				}
 			}
 
-			/ Build file paths list manually
+			// Build file paths list manually (Fixed comment)
 			def filePaths = []
 			for (file in testReports) {
 				filePaths << file.path
 			}
 			echo "Found test reports: ${filePaths.join(', ')}"
-			
+
 			if (testReports.size() == 0) {
 				echo "No test reports found! Verify test execution and paths."
 			} else {
 				echo "Processing ${testReports.size()} test reports."
-				
+
 				int totalFailedTests = 0
 				for (file in testReports) {
 					def failedTests = sh(script: "grep -c '<failure>' ${file.path} || true", returnStdout: true).trim()
 					totalFailedTests += failedTests.toInteger()
 				}
-				
+
 				if (totalFailedTests > 0) {
 					echo "Found ${totalFailedTests} failed tests. Marking build as UNSTABLE."
 					currentBuild.result = 'UNSTABLE'
 				} else {
 					echo "No failed tests found."
 				}
-			}	
+			}   
 		} catch (Exception e) {
 			echo "Caught exception: ${e.message}"
 			currentBuild.result = 'FAILURE'  // Set the build result to FAILURE in case of an error
 		}
+
 	}
 }
 
