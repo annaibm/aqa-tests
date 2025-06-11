@@ -56,10 +56,16 @@ ifneq ($(filter 18 19 20 21 22 23, $(JDK_VERSION)),)
   $(warning Environment variable JAVA_TOOL_OPTIONS is set to '$(JAVA_TOOL_OPTIONS)')
 endif
 
+ifndef NATIVE_TEST_LIBS
+  NATIVE_TEST_LIBS :=
+endif
+
 JAVA_ARGS = $(JVM_OPTIONS)
 ifeq (,$(findstring $(JDK_IMPL),hotspot))
   JAVA_ARGS += -Xdump:system:events=user
 endif
+
+JAVA_ARGS += -DNATIVE_TEST_LIBS=$(NATIVE_TEST_LIBS)
 
 ifndef APPLICATION_OPTIONS
   APPLICATION_OPTIONS :=
