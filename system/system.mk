@@ -56,10 +56,6 @@ ifneq ($(filter 18 19 20 21 22 23, $(JDK_VERSION)),)
   $(warning Environment variable JAVA_TOOL_OPTIONS is set to '$(JAVA_TOOL_OPTIONS)')
 endif
 
-ifndef NATIVE_TEST_LIBS
-  NATIVE_TEST_LIBS :=
-endif
-
 JAVA_ARGS = $(JVM_OPTIONS)
 ifeq (,$(findstring $(JDK_IMPL),hotspot))
   JAVA_ARGS += -Xdump:system:events=user
@@ -82,7 +78,7 @@ define SYSTEMTEST_CMD_TEMPLATE
 perl $(SYSTEMTEST_RESROOT)$(D)STF$(D)stf.core$(D)scripts$(D)stf.pl \
   -test-root=$(Q)$(SYSTEMTEST_RESROOT)$(D)STF;$(SYSTEMTEST_RESROOT)$(D)aqa-systemtest$(OPENJ9_PRAM)$(Q) \
   -systemtest-prereqs=$(Q)$(SYSTEM_LIB_DIR)$(D)$(Q) \
-  -java-args=$(SQ)$(JAVA_ARGS)$(SQ) \
+  -java-args=$(JAVA_ARGS) \
   -results-root=$(REPORTDIR)
 endef
 
