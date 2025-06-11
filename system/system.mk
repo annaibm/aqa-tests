@@ -73,12 +73,13 @@ endif
 ifndef SYSTEM_LIB_DIR
   SYSTEM_LIB_DIR=$(SYSTEMTEST_RESROOT)/systemtest_prereqs
 endif
+$(warning JAVA_ARGS is [$(JAVA_ARGS)])
 
 define SYSTEMTEST_CMD_TEMPLATE
 perl $(SYSTEMTEST_RESROOT)$(D)STF$(D)stf.core$(D)scripts$(D)stf.pl \
   -test-root=$(Q)$(SYSTEMTEST_RESROOT)$(D)STF;$(SYSTEMTEST_RESROOT)$(D)aqa-systemtest$(OPENJ9_PRAM)$(Q) \
   -systemtest-prereqs=$(Q)$(SYSTEM_LIB_DIR)$(D)$(Q) \
-  -java-args=$(JAVA_ARGS) \
+  -java-args=$(Q)$(JAVA_ARGS)$(Q) \
   -results-root=$(REPORTDIR)
 endef
 
