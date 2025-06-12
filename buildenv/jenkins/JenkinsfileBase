@@ -709,7 +709,12 @@ def buildTest() {
 		}
 
 		if (fileExists('jdkbinary/openjdk-test-image/openj9')) {
-			env.NATIVE_TEST_LIBS = "$WORKSPACE/jdkbinary/openjdk-test-image/openj9"
+			def nativeLibPath = "$WORKSPACE/jdkbinary/openjdk-test-image/openj9"
+			if (PLATFORM.contains("windows")) {
+				// Convert to Windows-style path using cygpath
+				nativeLibPath = bat(script: "cygpath -m ${nativeLibPath}", returnStdout: true).trim()
+			}
+			env.NATIVE_TEST_LIBS = nativeLibPath
 		}
 
 		if (!params.DYNAMIC_COMPILE) {
@@ -1085,24 +1090,24 @@ def terminateTestProcesses() {
 
 // For hide app windows to aid AWT and Arctic automated test execution
 def hideAppWindows() {
-        if (params.PLATFORM && params.PLATFORM.contains("mac")) {
-                // Do we have a logged in user console?
+		if (params.PLATFORM && params.PLATFORM.contains("mac")) {
+				// Do we have a logged in user console?
 		def consoleRc=sh(script:"who | grep console", returnStatus:true)
-                if (consoleRc == 0) {
+				if (consoleRc == 0) {
 			withEnv(['AWT_FORCE_HEADFUL=true']) {
-   		     		echo "HIDE_APP_WINDOWS: Hiding other app windows on Mac to aid automated AWT test execution"
-	                	def statusCode=sh(script:"cd aqa-tests/buildenv/jenkins/src && ${TEST_JDK_HOME}/bin/javac MinimizeMacWindows.java", returnStatus:true)
-        	        	if (statusCode != 0) {
-                	        	echo "rc = ${statusCode}, Unable to compile aqa-tests/MinimizeMacWindows.java."
-        			} else {
+   			 		echo "HIDE_APP_WINDOWS: Hiding other app windows on Mac to aid automated AWT test execution"
+						def statusCode=sh(script:"cd aqa-tests/buildenv/jenkins/src && ${TEST_JDK_HOME}/bin/javac MinimizeMacWindows.java", returnStatus:true)
+						if (statusCode != 0) {
+								echo "rc = ${statusCode}, Unable to compile aqa-tests/MinimizeMacWindows.java."
+					} else {
 					statusCode=sh(script:"cd aqa-tests/buildenv/jenkins/src && ${TEST_JDK_HOME}/bin/java -Djava.awt.headless=false MinimizeMacWindows", returnStatus:true)
-	                        	if (statusCode != 0) {
-        	                		echo "rc = ${statusCode}, Unable to hide app windows using aqa-tests/MinimizeMacWindows.java."
-                			}
+								if (statusCode != 0) {
+									echo "rc = ${statusCode}, Unable to hide app windows using aqa-tests/MinimizeMacWindows.java."
+							}
 				}
-	                }
+					}
 		}
-        }
+		}
 }
 
 def getJDKImpl(jvm_version) {
@@ -1147,8 +1152,8 @@ def getCustomUrl() {
 	if (jenkinsDomain.contains("hyc-runtimes")) {
 		jenkinsDomain = "openj9-jenkins.osuosl.org"
 	} else if (jenkinsDomain.contains("temurin-compliance")) {
-                jenkinsDomain = "ci.adoptium.net"
-        }
+				jenkinsDomain = "ci.adoptium.net"
+		}
 
 	def customUrl = "https://${jenkinsDomain}/job/test.getDependency/lastSuccessfulBuild/artifact/"
 	echo "Custom URL: ${customUrl}"
