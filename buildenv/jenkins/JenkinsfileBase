@@ -809,8 +809,8 @@ def runTest( ) {
         echo "Display mode for tests: ${DISPLAY_MODE}"
 
         // Append display mode as JVM property for test filtering
-        RUNTEST_CMD = "${TARGET} ${CUSTOM_OPTION} -Dtest.displayMode=${DISPLAY_MODE}"
-		//RUNTEST_CMD = "${TARGET} ${CUSTOM_OPTION}"
+        //RUNTEST_CMD = "${TARGET} ${CUSTOM_OPTION} -Dtest.displayMode=${DISPLAY_MODE}"
+		RUNTEST_CMD = "${TARGET} ${CUSTOM_OPTION}"
 		if (env.BUILD_LIST.contains('jck') || env.BUILD_LIST.contains('openjdk') || env.BUILD_LIST.contains('functional')) {
 			if (env.SPEC.startsWith('aix')) {
 				sh "/usr/bin/X11/X -force -vfb -x abx -x dbe -x GLX -secIP 000 :0 &"
