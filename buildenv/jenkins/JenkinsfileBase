@@ -766,41 +766,45 @@ def buildTest() {
 	}
 }
 
-def runTest( ) {
-	stage('Test') {
-		echo 'Running tests...'
+def runTest() {
+    stage('Test') {
+        echo 'Running tests...'
+
+        // Detect X11 and Wayland availability
         env.HAS_X11 = sh(script: "ldconfig -p | grep -q libXtst && echo true || echo false", returnStdout: true).trim()
         env.HAS_WAYLAND = sh(script: "command -v weston >/dev/null && echo true || echo false", returnStdout: true).trim()
         echo "HAS_X11=${env.HAS_X11}, HAS_WAYLAND=${env.HAS_WAYLAND}"
-		if (env.BUILD_LIST.contains('jck') || env.BUILD_LIST.contains('openjdk')) {
-			// Hide other app windows to aid AWT and Arctic automated test execution for jck and openjdk AWT automation tests
-			hideAppWindows()
-		}
 
-		def CUSTOM_OPTION = ''
+        // Hide other app windows for AWT tests
+        if (env.BUILD_LIST.contains('jck') || env.BUILD_LIST.contains('openjdk')) {
+            hideAppWindows()
+        }
 
-		TARGET = "${params.TARGET}";
-		if (TARGET.contains('custom') && CUSTOM_TARGET!='') {
-			if (TARGET == 'system_custom') {
-				env.SYSTEM_CUSTOM_TARGET=CUSTOM_TARGET
-			} else {
-				// remove suffix, then set CUSTOM_OPTION (i.e., jdk_custom_0 will become jdk_custom)
-				def removeDisabled = TARGET.replaceAll("disabled.", "")
-				def removeSuffix = removeDisabled.replaceAll(/_\d+$/, "")
-				CUSTOM_OPTION = "${removeSuffix.toUpperCase()}_TARGET='${CUSTOM_TARGET}'"
-			}
-		}
-		if (!TARGET.startsWith('-f')) {
-			TARGET="_${params.TARGET}"
-		} else if (TARGET.contains('-f parallelList.mk') && SPEC.startsWith('zos')) {
-			def parallelList = "aqa-tests/TKG/parallelList.mk"
-			if (fileExists("${parallelList}")) {
-				echo 'Converting parallelList.mk file from ascii to ebcdic...'
-				sh "iconv -f iso8859-1 -t ibm-1047 ${parallelList} > ${parallelList}.ebcdic; rm ${parallelList}; mv ${parallelList}.ebcdic ${parallelList}"
-			}
-		}
-        // Determine display mode for tests
-        def DISPLAY_MODE = 'headless' // default
+        // Determine TARGET and CUSTOM_OPTION
+        def CUSTOM_OPTION = ''
+        TARGET = "${params.TARGET}"
+        if (TARGET.contains('custom') && CUSTOM_TARGET != '') {
+            if (TARGET == 'system_custom') {
+                env.SYSTEM_CUSTOM_TARGET = CUSTOM_TARGET
+            } else {
+                def removeDisabled = TARGET.replaceAll("disabled.", "")
+                def removeSuffix = removeDisabled.replaceAll(/_\d+$/, "")
+                CUSTOM_OPTION = "${removeSuffix.toUpperCase()}_TARGET='${CUSTOM_TARGET}'"
+            }
+        }
+
+        if (!TARGET.startsWith('-f')) {
+            TARGET = "_${params.TARGET}"
+        } else if (TARGET.contains('-f parallelList.mk') && SPEC.startsWith('zos')) {
+            def parallelList = "aqa-tests/TKG/parallelList.mk"
+            if (fileExists(parallelList)) {
+                echo 'Converting parallelList.mk file from ASCII to EBCDIC...'
+                sh "iconv -f iso8859-1 -t ibm-1047 ${parallelList} > ${parallelList}.ebcdic; rm ${parallelList}; mv ${parallelList}.ebcdic ${parallelList}"
+            }
+        }
+
+        // Determine display mode
+        def DISPLAY_MODE = 'headless'
         if (env.HAS_X11 == 'true') {
             DISPLAY_MODE = 'x11'
         } else if (env.HAS_WAYLAND == 'true') {
@@ -808,100 +812,100 @@ def runTest( ) {
         }
         echo "Display mode for tests: ${DISPLAY_MODE}"
 
-        // Append display mode as JVM property for test filtering
-        //RUNTEST_CMD = "${TARGET} ${CUSTOM_OPTION} -Dtest.displayMode=${DISPLAY_MODE}"
-		RUNTEST_CMD = "${TARGET} ${CUSTOM_OPTION}"
-		if (env.BUILD_LIST.contains('jck') || env.BUILD_LIST.contains('openjdk') || env.BUILD_LIST.contains('functional')) {
-			if (env.SPEC.startsWith('aix')) {
-				sh "/usr/bin/X11/X -force -vfb -x abx -x dbe -x GLX -secIP 000 :0 &"
-				env.DISPLAY = "unix:0"
-				echo "env.DISPLAY is ${env.DISPLAY}"
+        // Set JVM/test-specific options
+        env.TEST_JVM_OPTIONS = "-Dtest.displayMode=${DISPLAY_MODE}"
+        RUNTEST_CMD = "${TARGET} ${CUSTOM_OPTION}"
+        echo "Final test command: ${RUNTEST_CMD}"
 
-			} else if (env.SPEC.startsWith('sunos')) {
-				sh "/usr/X11/bin/Xvfb :2 -screen 0 1024x768x24 &"
-				env.DISPLAY = ":2"
-				echo "env.DISPLAY is ${env.DISPLAY}"
-			}
-		}
-		for (int i = 1; i <= ITERATIONS; i++) {
-			echo "ITERATION: ${i}/${ITERATIONS}"
-			if (env.SPEC.contains('linux') && (BUILD_LIST != "external")) {
-				// Detect if Xvfb is on the machine, and if not use the wayland startup code (Initially for EL10)
-				if ( sh(script:"which Xvfb 2>&1", returnStatus:true) != 0 ) {
-					// XDG_RUNTIME_DIR is limited to 108 chars, so create a short tmp symlink
-					def tmp_wayland = sh(script: 'echo wayland-$(id -u)', returnStdout: true).trim()
-					echo "Creating temporary wayland path and symlink /tmp/${tmp_wayland}"
-					sh "rm -rf /tmp/${tmp_wayland} && mkdir -pm 0700 /tmp/${tmp_wayland}"
+        // Setup display for AWT/functional tests
+        if (env.BUILD_LIST.contains('jck') || env.BUILD_LIST.contains('openjdk') || env.BUILD_LIST.contains('functional')) {
+            if (env.SPEC.startsWith('aix')) {
+                sh "/usr/bin/X11/X -force -vfb -x abx -x dbe -x GLX -secIP 000 :0 &"
+                env.DISPLAY = "unix:0"
+            } else if (env.SPEC.startsWith('sunos')) {
+                sh "/usr/X11/bin/Xvfb :2 -screen 0 1024x768x24 &"
+                env.DISPLAY = ":2"
+            }
+            echo "env.DISPLAY is ${env.DISPLAY}"
+        }
 
-					sh "mkdir -pm 0700 " + env.WORKSPACE + "/.xdg-runtime"
+        // Run iterations
+        for (int i = 1; i <= ITERATIONS; i++) {
+            echo "ITERATION: ${i}/${ITERATIONS}"
 
-					// symlink tmp XDG path to workspace path
-					env.XDG_RUNTIME_DIR = "/tmp/${tmp_wayland}"
-					sh "ln -sfn " + env.XDG_RUNTIME_DIR + " " + env.WORKSPACE + "/.xdg-runtime"
+            if (env.SPEC.contains('linux') && (BUILD_LIST != "external")) {
+                // Linux display handling
+                if (sh(script: "which Xvfb 2>&1", returnStatus: true) != 0) {
+                    // Wayland fallback
+                    def tmp_wayland = sh(script: 'echo wayland-$(id -u)', returnStdout: true).trim()
+                    echo "Creating temporary Wayland path /tmp/${tmp_wayland}"
+                    sh "rm -rf /tmp/${tmp_wayland} && mkdir -pm 0700 /tmp/${tmp_wayland}"
+                    sh "mkdir -pm 0700 ${env.WORKSPACE}/.xdg-runtime"
+                    env.XDG_RUNTIME_DIR = "/tmp/${tmp_wayland}"
+                    sh "ln -sfn ${env.XDG_RUNTIME_DIR} ${env.WORKSPACE}/.xdg-runtime"
+                    sh "mkdir -p -m 1777 /tmp/.X11-unix"
+                    sh "weston --no-config --socket=wayland-vfb --backend=headless-backend.so --xwayland &"
+                    env.DISPLAY = ":0"
+                    echo "env.DISPLAY is ${env.DISPLAY}"
 
-					sh "mkdir -p -m 1777 /tmp/.X11-unix"
-					sh "weston --no-config --socket=wayland-vfb --backend=headless-backend.so --xwayland &"
-					env.DISPLAY = ":0"
+                    sshagent(credentials: ["$params.SSH_AGENT_CREDENTIAL"], ignoreMissing: true) {
+                        makeTest(RUNTEST_CMD)
+                    }
+                } else {
+                    // Xvfb path
+                    wrap([$class: 'Xvfb', autoDisplayName: true, timeout: 20]) {
+                        env.DISPLAY = sh(script: "ps -f | grep '[X]vfb' | awk '{print \$9}'", returnStdout: true).trim()
+                        echo "env.DISPLAY is ${env.DISPLAY}"
 
-					echo "env.DISPLAY is ${env.DISPLAY}"
-					sshagent (credentials: ["$params.SSH_AGENT_CREDENTIAL"], ignoreMissing: true) {
-						makeTest("${RUNTEST_CMD}")
-					}
-				} else {
-					// Add an additional 10 second timeout due to issue: https://github.com/adoptium/temurin-build/issues/2368#issuecomment-756683888
-					wrap([$class: 'Xvfb', autoDisplayName: true, timeout:20]) {
-						def DISPLAY = sh (
-								script: 'ps -f | grep \'[X]vfb\' | awk \'{print \$9}\'',
-								returnStdout: true
-						).trim()
-						env.DISPLAY = "${DISPLAY}"
-						echo "env.DISPLAY is ${env.DISPLAY}"
-						sshagent (credentials: ["$params.SSH_AGENT_CREDENTIAL"], ignoreMissing: true) {
-							makeTest("${RUNTEST_CMD}")
-						}
-					}
-				}
-			} else if (env.SPEC.startsWith('zos')) { 
-				makeTest("${RUNTEST_CMD}")
-			} else {
-				sshagent (credentials: ["$params.SSH_AGENT_CREDENTIAL"], ignoreMissing: true) {
-					makeTest("${RUNTEST_CMD}")
-				}
-			}
-		}
-
-		if (params.CODE_COVERAGE) {
-			echo 'Generating Code Coverage Reports...'
-			dir("$WORKSPACE/jdkbinary/j2sdk-image") {
-				// Current lcov generates "Cannot open source file" info, but does not affect results, since Build and Test paths difference are corrected after summary.
-				sh "lcov --capture --quiet --directory . --output-file codeCoverageInfoOrigin.info --rc geninfo_adjust_src_path='/home/jenkins/workspace/ => ${WORKSPACE}/jdkbinary/j2sdk-image/jenkins/workspace/'"
-				sh "lcov --quiet --output-file codeCoverageInfoFinal.info --remove codeCoverageInfoOrigin.info '/usr/include/*' '/usr/local/*' '/home/*/attrlookup.gperf'"
-				sh "genhtml --quiet codeCoverageInfoFinal.info --output-directory code_coverage_report"
-			}
-		}
-
-                if (env.BUILD_LIST.startsWith('perf')) {
-                    checkDacapoH2Metric()
+                        sshagent(credentials: ["$params.SSH_AGENT_CREDENTIAL"], ignoreMissing: true) {
+                            makeTest(RUNTEST_CMD)
+                        }
+                    }
                 }
+            } else if (env.SPEC.startsWith('zos')) {
+                makeTest(RUNTEST_CMD)
+            } else {
+                sshagent(credentials: ["$params.SSH_AGENT_CREDENTIAL"], ignoreMissing: true) {
+                    makeTest(RUNTEST_CMD)
+                }
+            }
+        }
 
-		def resultSum = [:]
-		def matcher = manager.getLogMatcher(".*(TOTAL: \\d+)\\s*(EXECUTED: \\d+)\\s*(PASSED: \\d+)\\s*(FAILED: \\d+)\\s*(DISABLED: \\d+)?\\s*(SKIPPED: \\d+)\\s*\$")
-		if (matcher?.matches()) {
-			for (int i = 1; i <= matcher.groupCount(); i++) {
-				if (matcher.group(i) != null) {
-					def matchVals = matcher.group(i).split(": ")
-					resultSum[matchVals[0]] = matchVals[1] as int
-				}
-			}
-			checkTestResults(resultSum)
-		} else {
-			env.jobStatus = 'FAILURE'
-			echo 'Could not find test result, set build result to FAILURE.'
-			def summary = manager.createSummary("error.svg")
-			summary.appendText("TEST BUILD FAILURE!", false)
-		}
-	}
+        // Code coverage
+        if (params.CODE_COVERAGE) {
+            echo 'Generating Code Coverage Reports...'
+            dir("$WORKSPACE/jdkbinary/j2sdk-image") {
+                sh "lcov --capture --quiet --directory . --output-file codeCoverageInfoOrigin.info --rc geninfo_adjust_src_path='/home/jenkins/workspace/ => ${WORKSPACE}/jdkbinary/j2sdk-image/jenkins/workspace/'"
+                sh "lcov --quiet --output-file codeCoverageInfoFinal.info --remove codeCoverageInfoOrigin.info '/usr/include/*' '/usr/local/*' '/home/*/attrlookup.gperf'"
+                sh "genhtml --quiet codeCoverageInfoFinal.info --output-directory code_coverage_report"
+            }
+        }
+
+        // Perf metrics
+        if (env.BUILD_LIST.startsWith('perf')) {
+            checkDacapoH2Metric()
+        }
+
+        // Test result parsing
+        def resultSum = [:]
+        def matcher = manager.getLogMatcher(".*(TOTAL: \\d+)\\s*(EXECUTED: \\d+)\\s*(PASSED: \\d+)\\s*(FAILED: \\d+)\\s*(DISABLED: \\d+)?\\s*(SKIPPED: \\d+)\\s*\$")
+        if (matcher?.matches()) {
+            for (int i = 1; i <= matcher.groupCount(); i++) {
+                if (matcher.group(i) != null) {
+                    def matchVals = matcher.group(i).split(": ")
+                    resultSum[matchVals[0]] = matchVals[1] as int
+                }
+            }
+            checkTestResults(resultSum)
+        } else {
+            env.jobStatus = 'FAILURE'
+            echo 'Could not find test result, set build result to FAILURE.'
+            def summary = manager.createSummary("error.svg")
+            summary.appendText("TEST BUILD FAILURE!", false)
+        }
+    }
 }
+
 
 def checkTestResults(results) {
 	if (results.isEmpty()) {
