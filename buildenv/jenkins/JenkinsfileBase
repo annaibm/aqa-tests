@@ -770,12 +770,12 @@ def runTest() {
     stage('Test') {
         echo 'Running tests...'
 
-        // Detect X11 and Wayland availability
+        // Detect available display servers
         env.HAS_X11 = sh(script: "ldconfig -p | grep -q libXtst && echo true || echo false", returnStdout: true).trim()
         env.HAS_WAYLAND = sh(script: "command -v weston >/dev/null && echo true || echo false", returnStdout: true).trim()
         echo "HAS_X11=${env.HAS_X11}, HAS_WAYLAND=${env.HAS_WAYLAND}"
 
-        // Hide other app windows for AWT tests
+        // Hide other app windows for JCK/OpenJDK tests
         if (env.BUILD_LIST.contains('jck') || env.BUILD_LIST.contains('openjdk')) {
             hideAppWindows()
         }
@@ -797,13 +797,13 @@ def runTest() {
             TARGET = "_${params.TARGET}"
         } else if (TARGET.contains('-f parallelList.mk') && SPEC.startsWith('zos')) {
             def parallelList = "aqa-tests/TKG/parallelList.mk"
-            if (fileExists(parallelList)) {
-                echo 'Converting parallelList.mk file from ASCII to EBCDIC...'
-                sh "iconv -f iso8859-1 -t ibm-1047 ${parallelList} > ${parallelList}.ebcdic; rm ${parallelList}; mv ${parallelList}.ebcdic ${parallelList}"
+            if (fileExists("${parallelList}")) {
+                echo 'Converting parallelList.mk file from ascii to ebcdic...'
+                sh "iconv -f iso8859-1 -t ibm-1047 ${parallelList} > ${parallelList}.ebcdic; mv ${parallelList}.ebcdic ${parallelList}"
             }
         }
 
-        // Determine display mode
+        // Determine display mode for tests
         def DISPLAY_MODE = 'headless'
         if (env.HAS_X11 == 'true') {
             DISPLAY_MODE = 'x11'
@@ -812,12 +812,12 @@ def runTest() {
         }
         echo "Display mode for tests: ${DISPLAY_MODE}"
 
-        // Set JVM/test-specific options
+        // Set JVM options for tests
         env.TEST_JVM_OPTIONS = "-Dtest.displayMode=${DISPLAY_MODE}"
         RUNTEST_CMD = "${TARGET} ${CUSTOM_OPTION}"
         echo "Final test command: ${RUNTEST_CMD}"
 
-        // Setup display for AWT/functional tests
+        // OS-specific display setup
         if (env.BUILD_LIST.contains('jck') || env.BUILD_LIST.contains('openjdk') || env.BUILD_LIST.contains('functional')) {
             if (env.SPEC.startsWith('aix')) {
                 sh "/usr/bin/X11/X -force -vfb -x abx -x dbe -x GLX -secIP 000 :0 &"
@@ -829,16 +829,14 @@ def runTest() {
             echo "env.DISPLAY is ${env.DISPLAY}"
         }
 
-        // Run iterations
+        // Run tests per iteration
         for (int i = 1; i <= ITERATIONS; i++) {
             echo "ITERATION: ${i}/${ITERATIONS}"
 
             if (env.SPEC.contains('linux') && (BUILD_LIST != "external")) {
-                // Linux display handling
+                // Linux: Use Xvfb if available, otherwise Wayland
                 if (sh(script: "which Xvfb 2>&1", returnStatus: true) != 0) {
-                    // Wayland fallback
                     def tmp_wayland = sh(script: 'echo wayland-$(id -u)', returnStdout: true).trim()
-                    echo "Creating temporary Wayland path /tmp/${tmp_wayland}"
                     sh "rm -rf /tmp/${tmp_wayland} && mkdir -pm 0700 /tmp/${tmp_wayland}"
                     sh "mkdir -pm 0700 ${env.WORKSPACE}/.xdg-runtime"
                     env.XDG_RUNTIME_DIR = "/tmp/${tmp_wayland}"
@@ -849,29 +847,32 @@ def runTest() {
                     echo "env.DISPLAY is ${env.DISPLAY}"
 
                     sshagent(credentials: ["$params.SSH_AGENT_CREDENTIAL"], ignoreMissing: true) {
-                        makeTest(RUNTEST_CMD)
+                        sh "make ${RUNTEST_CMD} TEST_JVM_OPTIONS='${env.TEST_JVM_OPTIONS}'"
                     }
+
                 } else {
-                    // Xvfb path
+                    // Use Xvfb wrapper
                     wrap([$class: 'Xvfb', autoDisplayName: true, timeout: 20]) {
-                        env.DISPLAY = sh(script: "ps -f | grep '[X]vfb' | awk '{print \$9}'", returnStdout: true).trim()
+                        def DISPLAY = sh(script: "ps -f | grep '[X]vfb' | awk '{print \$9}'", returnStdout: true).trim()
+                        env.DISPLAY = "${DISPLAY}"
                         echo "env.DISPLAY is ${env.DISPLAY}"
 
                         sshagent(credentials: ["$params.SSH_AGENT_CREDENTIAL"], ignoreMissing: true) {
-                            makeTest(RUNTEST_CMD)
+                            sh "make ${RUNTEST_CMD} TEST_JVM_OPTIONS='${env.TEST_JVM_OPTIONS}'"
                         }
                     }
                 }
+
             } else if (env.SPEC.startsWith('zos')) {
-                makeTest(RUNTEST_CMD)
+                makeTest("${RUNTEST_CMD} TEST_JVM_OPTIONS='${env.TEST_JVM_OPTIONS}'")
             } else {
                 sshagent(credentials: ["$params.SSH_AGENT_CREDENTIAL"], ignoreMissing: true) {
-                    makeTest(RUNTEST_CMD)
+                    sh "make ${RUNTEST_CMD} TEST_JVM_OPTIONS='${env.TEST_JVM_OPTIONS}'"
                 }
             }
         }
 
-        // Code coverage
+        // Optional code coverage
         if (params.CODE_COVERAGE) {
             echo 'Generating Code Coverage Reports...'
             dir("$WORKSPACE/jdkbinary/j2sdk-image") {
@@ -886,7 +887,7 @@ def runTest() {
             checkDacapoH2Metric()
         }
 
-        // Test result parsing
+        // Test result summary
         def resultSum = [:]
         def matcher = manager.getLogMatcher(".*(TOTAL: \\d+)\\s*(EXECUTED: \\d+)\\s*(PASSED: \\d+)\\s*(FAILED: \\d+)\\s*(DISABLED: \\d+)?\\s*(SKIPPED: \\d+)\\s*\$")
         if (matcher?.matches()) {
@@ -905,6 +906,7 @@ def runTest() {
         }
     }
 }
+
 
 
 def checkTestResults(results) {
