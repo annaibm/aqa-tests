@@ -832,7 +832,7 @@ def runTest() {
         // Run iterations
         for (int i = 1; i <= ITERATIONS; i++) {
             echo "ITERATION: ${i}/${ITERATIONS}"
-            def testCommandWithOptions = "${RUNTEST_CMD} TEST_JVM_OPTIONS='${env.TEST_JVM_OPTIONS}'"
+            def testCommandWithOptions = "${RUNTEST_CMD} -vmoptions:'${env.TEST_JVM_OPTIONS}'"
             if (env.SPEC.contains('linux') && (BUILD_LIST != "external")) {
                 // Linux display handling
                 if (sh(script: "which Xvfb 2>&1", returnStatus: true) != 0) {
