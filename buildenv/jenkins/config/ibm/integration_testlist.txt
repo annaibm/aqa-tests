@@ -1,0 +1,29 @@
+# IBM Java 8 Integration Test List
+# System Tests (10 tests from issue #35)
+iointerops_9
+interrupt_0
+interrupt_3
+serbuf_0
+serbuf.collocated_4
+abbs.5mins_1
+abbs.5mins_3
+harmony.5mins_2
+Java_version
+mauve.5mins
+# JCK Tests (18 tests from issue #35)
+jck-runtime-api-java_lang-serialization
+jck-runtime-api-java_lang-Runtime
+jck-runtime-api-java_util-treemap
+jck-runtime-api-java_util-Currency
+jck-runtime-api-java_util-Hashtable
+jck-runtime-api-java_util-LinkedList
+jck-runtime-api-java_util-concurrent_atomic
+jck-runtime-api-java_util-SimpleTimeZone
+jck-runtime-api-java_io-CharacterEncoding
+jck-runtime-api-java_io-FilePermission
+jck-runtime-api-java_io-PrintStream
+jck-runtime-api-java_nio-Buffer
+jck-runtime-api-java_security-algorithmparameters
+jck-runtime-api-java_security-KeyFactory
+jck-runtime-api-java_security-KeyPair
+jck-runtime-api-xsl-conf_node
