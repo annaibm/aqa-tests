@@ -53,6 +53,11 @@ getSemeruDockerfile() {
                 if [[ $jdkVersion -lt 21 ]]; then
                     findCommandAndReplace '\/opt\/java\/openjdk\/legal\/java.base\/LICENSE \/licenses;' "\/opt\/java\/openjdk\/legal\/java.base\/LICENSE \/licenses\/;" $semeruDockerfile true
                 fi
+                # UBI 10 specific fixes: remove iptables and other packages that don't exist
+                if [[ $docker_os_version == "10" ]]; then
+                    # Remove iptables from the package list as it doesn't exist in UBI 10
+                    findCommandAndReplace 'iptables-libs iptables jansson libibverbs libmnl libnet libnftnl libpcap nftables protobuf-c' 'jansson libibverbs libnet libnftnl libpcap nftables protobuf-c' $semeruDockerfile false
+                fi
             else # docker_os is ubuntu
                 echo "curl -OLJSks ${semeruDockerfileUrlBase}/${semeruDockerfile}"
                 curl -OLJSks ${semeruDockerfileUrlBase}/${semeruDockerfile}
@@ -147,7 +152,7 @@ findCommandAndReplace() {
 
 buildImage() {
     echo "build image at $(pwd)..."
-    sudo podman build -t local-ibm-semeru-runtimes:latest -f Dockerfile.open.releases.full . --build-arg DOCKER_REGISTRY_CREDENTIALS_USR=$DOCKER_REGISTRY_CREDENTIALS_USR --build-arg DOCKER_REGISTRY_CREDENTIALS_PSW=$DOCKER_REGISTRY_CREDENTIALS_PSW 2>&1 | tee build_semeru_image.log 
+    sudo podman build -t local-ibm-semeru-runtimes:latest -f Dockerfile.open.releases.full . --build-arg DOCKER_REGISTRY_CREDENTIALS_USR=$DOCKER_REGISTRY_CREDENTIALS_USR --build-arg DOCKER_REGISTRY_CREDENTIALS_PSW=$DOCKER_REGISTRY_CREDENTIALS_PSW 2>&1 | tee build_semeru_image.log
     # Temporarily OpenLiberty ubi dockerfile only supports openjdk 17, not 11, need to add jdkVersion for ubuntu support later
     sudo podman build -t icr.io/appcafe/open-liberty:beta-instanton -f ci.docker/releases/latest/full/Dockerfile.${docker_os}.openjdk17 ci.docker/releases/latest/beta
     sudo podman build -t ol-instanton-test-pingperf:latest -f Dockerfile.pingperf .
