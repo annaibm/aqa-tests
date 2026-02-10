@@ -58,6 +58,9 @@ getSemeruDockerfile() {
                     # Remove iptables from the package list as it doesn't exist in UBI 10
                     findCommandAndReplace 'iptables-libs iptables jansson libibverbs libmnl libnet libnftnl libpcap nftables protobuf-c' 'jansson libibverbs libnet libnftnl libpcap nftables protobuf-c' $semeruDockerfile false
                 fi
+                # Remove specific version constraints for libexpat1 packages to avoid 404 errors when versions are superseded
+                findCommandAndReplace 'libexpat1-dev=[^ ]*' 'libexpat1-dev' $semeruDockerfile false
+                findCommandAndReplace 'libexpat1=[^ ]*' 'libexpat1' $semeruDockerfile false
             else # docker_os is ubuntu
                 echo "curl -OLJSks ${semeruDockerfileUrlBase}/${semeruDockerfile}"
                 curl -OLJSks ${semeruDockerfileUrlBase}/${semeruDockerfile}
