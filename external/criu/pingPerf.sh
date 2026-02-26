@@ -305,6 +305,7 @@ pullImageUnprivilegedRestore() {
     dockerRegistryLogin
     getImageNameList
     echo "The host machine micro-architecture is ${node_label_micro_architecture}"
+    tested=0 
     for restore_docker_image_name in ${restore_docker_image_name_list[@]}
     do
         echo "Pulling image $restore_docker_image_name"
@@ -323,7 +324,13 @@ pullImageUnprivilegedRestore() {
         restoreImage=$restore_docker_image_name
         testUnprivilegedRestoreOnly
         clean
+        tested=$((tested + 1))
     done
+
+    if [ $tested -eq 0 ]; then
+        echo "ERROR: No images were successfully tested."
+        exit 1
+    fi
 
     dockerRegistryLogout
 }
@@ -332,6 +339,7 @@ pullImagePrivilegedRestore() {
     dockerRegistryLogin
     getImageNameList
     echo "The host machine micro-architecture is ${node_label_micro_architecture}"
+    tested=0
     for restore_docker_image_name in ${restore_docker_image_name_list[@]}
     do
         echo "Pulling image $restore_docker_image_name"
@@ -349,8 +357,13 @@ pullImagePrivilegedRestore() {
         restoreImage=$restore_docker_image_name
         testPrivilegedRestoreOnly
         clean
+        tested=$((tested + 1))
     done
-
+    
+    if [ $tested -eq 0 ]; then  # ← ADD THIS
+        echo "ERROR: No images were successfully tested."
+        exit 1
+    fi
     dockerRegistryLogout
 }
 
