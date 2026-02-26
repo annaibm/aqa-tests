@@ -308,6 +308,14 @@ pullImageUnprivilegedRestore() {
     for restore_docker_image_name in ${restore_docker_image_name_list[@]}
     do
         echo "Pulling image $restore_docker_image_name"
+
+        # Pre-flight check: verify image exists before attempting pull
+        echo "Checking if image exists in registry..."
+        if ! sudo podman manifest inspect $restore_docker_image_name &>/dev/null; then
+            echo "SKIP: Image $restore_docker_image_name not available in registry (likely not built for this architecture/OS combination)"
+            continue
+        fi
+
         sudo podman pull $restore_docker_image_name
         getCriuseccompproFile
 
@@ -327,6 +335,14 @@ pullImagePrivilegedRestore() {
     for restore_docker_image_name in ${restore_docker_image_name_list[@]}
     do
         echo "Pulling image $restore_docker_image_name"
+
+        # Pre-flight check: verify image exists before attempting pull
+        echo "Checking if image exists in registry..."
+        if ! sudo podman manifest inspect $restore_docker_image_name &>/dev/null; then
+            echo "SKIP: Image $restore_docker_image_name not available in registry (likely not built for this architecture/OS combination)"
+            continue
+        fi
+
         sudo podman pull $restore_docker_image_name
 
         # restore
