@@ -312,8 +312,9 @@ pullImageUnprivilegedRestore() {
 
         # Pre-flight check: verify image exists before attempting pull
         echo "Checking if image exists in registry..."
-        if ! sudo podman manifest inspect $restore_docker_image_name &>/dev/null; then
-            echo "SKIP: Image $restore_docker_image_name not available in registry (likely not built for this architecture/OS combination)"
+        if ! skopeo inspect --creds "${DOCKER_REGISTRY_CREDENTIALS_USR}:${DOCKER_REGISTRY_CREDENTIALS_PSW}" \
+            docker://$restore_docker_image_name &>/dev/null; then
+            echo "SKIP: Image $restore_docker_image_name not available in registry"
             continue
         fi
 
@@ -346,8 +347,9 @@ pullImagePrivilegedRestore() {
 
         # Pre-flight check: verify image exists before attempting pull
         echo "Checking if image exists in registry..."
-        if ! sudo podman manifest inspect $restore_docker_image_name &>/dev/null; then
-            echo "SKIP: Image $restore_docker_image_name not available in registry (likely not built for this architecture/OS combination)"
+        if ! skopeo inspect --creds "${DOCKER_REGISTRY_CREDENTIALS_USR}:${DOCKER_REGISTRY_CREDENTIALS_PSW}" \
+            docker://$restore_docker_image_name &>/dev/null; then
+            echo "SKIP: Image $restore_docker_image_name not available in registry"
             continue
         fi
 
