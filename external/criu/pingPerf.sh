@@ -57,6 +57,8 @@ getSemeruDockerfile() {
                 if [[ $docker_os_version == "10" ]]; then
                     # Remove iptables from the package list as it doesn't exist in UBI 10
                     findCommandAndReplace 'iptables-libs iptables jansson libibverbs libmnl libnet libnftnl libpcap nftables protobuf-c' 'jansson libibverbs libnet libnftnl libpcap nftables protobuf-c' $semeruDockerfile false
+                    # Add --no-same-permissions to tar to avoid permission errors in rootless podman builds
+                    findCommandAndReplace 'tar -xzf criu.tar.gz --strip-components=1;' 'tar -xzf criu.tar.gz --strip-components=1 --no-same-permissions;' $semeruDockerfile false
                 fi
                 # Remove specific version constraints for libexpat1 packages to avoid 404 errors when versions are superseded
                 findCommandAndReplace 'libexpat1-dev=[^ ]*' 'libexpat1-dev' $semeruDockerfile false
@@ -305,7 +307,7 @@ pullImageUnprivilegedRestore() {
     dockerRegistryLogin
     getImageNameList
     echo "The host machine micro-architecture is ${node_label_micro_architecture}"
-    tested=0 
+    tested=0
     for restore_docker_image_name in ${restore_docker_image_name_list[@]}
     do
         echo "Pulling image $restore_docker_image_name"
@@ -361,8 +363,8 @@ pullImagePrivilegedRestore() {
         clean
         tested=$((tested + 1))
     done
-    
-    if [ $tested -eq 0 ]; then  # ← ADD THIS
+
+    if [ $tested -eq 0 ]; then
         echo "ERROR: No images were successfully tested."
         exit 1
     fi
