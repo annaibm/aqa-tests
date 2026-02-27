@@ -246,7 +246,7 @@ timestamps{
                                     ['LABEL_ADDITION' : "${commonLabel}&&hw.arch.ppc64le.p9&&!sw.os.ubuntu.24"]
                                 ]
                     ]
-                    target = "testList TESTLIST=disabled.criu_pingPerf_testCreateRestoreImageAndPushToRegistry_ubi8,disabled.criu_pingPerf_testCreateRestoreImageAndPushToRegistry_ubi9,criu_pingPerf_testCreateRestoreImageAndPushToRegistry_ubi10,disabled.criu-portable-checkpoint_test,disabled.criu-ubi-portable-checkpoint_test"
+                    target = "testList TESTLIST=criu_pingPerf_testCreateRestoreImageAndPushToRegistry_ubi10"
 
                     if (params.PLATFORM == "ppc64le_linux") {
                         // exclude criu-portable-checkpoint_test on plinux due to github_ibm/runtimes/backlog/issues/1099
