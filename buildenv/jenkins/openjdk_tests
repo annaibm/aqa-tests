@@ -208,7 +208,8 @@ timestamps{
                                     // rhel.8 excluded from upload: ubi10 tar permission bug on rhel.8 (runtimes_backlog_issues_879)
                                     // ['LABEL_ADDITION' : "${commonLabel}&&sw.os.rhel.8&&hw.arch.s390x.z14"],
                                     // no machine available ['LABEL_ADDITION' : "${commonLabel}&&sw.os.rhel.8&&hw.arch.s390x.z15"],
-                                    ['LABEL_ADDITION' : "${commonLabel}&&sw.os.rhel.9&&hw.arch.s390x.z14"]
+                                    // rhel.9 s390x excluded from upload: sudo requires password on all available nodes (runtimes_backlog_issues_879)
+                                    // ['LABEL_ADDITION' : "${commonLabel}&&sw.os.rhel.9&&hw.arch.s390x.z14"]
                                     // no machine available ['LABEL_ADDITION' : "${commonLabel}&&sw.os.rhel.9&&hw.arch.s390x.z15"]
                                 ],
                         'ppc64le_linux' : [
