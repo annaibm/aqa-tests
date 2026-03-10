@@ -62,7 +62,7 @@ ifeq ($(OS),FreeBSD)
 endif
 ifeq ($(CYGWIN),1)
  	NPROCS:=$(NUMBER_OF_PROCESSORS)
-	MEMORY_SIZE:=$(shell powershell -command "(Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory / 1024 / 1024")
+	MEMORY_SIZE:=$(shell powershell -command "[int]((Get-CimInstance Win32_ComputerSystem).TotalPhysicalMemory / 1024 / 1024)")
 endif
 ifeq ($(OS),SunOS)	
 	NPROCS:=$(shell psrinfo | wc -l)
@@ -76,7 +76,7 @@ endif
 MEM := $(shell expr $(MEMORY_SIZE) / 2048)
 CORE := $(shell expr $(NPROCS) / 2 + 1)
 CONC := $(CORE)
-ifeq ($(shell expr $(CORE) \> $(MEM)), 1)
+ifeq ($(shell test $(CORE) -gt $(MEM) && echo 1 || echo 0), 1)
 	CONC := $(MEM)
 endif
 # Can't determine cores on zOS, use a reasonable default
