@@ -53,6 +53,7 @@ java/lang/ProcessBuilder/Basic.java		https://github.com/eclipse-openj9/openj9/is
 java/lang/ProcessBuilder/PipelineLeaksFD.java https://github.com/eclipse-openj9/openj9/issues/19728 linux-s390x
 java/lang/ProcessBuilder/SkipTest.java https://github.com/eclipse-openj9/openj9/issues/4124 windows-all
 java/lang/ProcessHandle/TreeTest.java https://github.com/eclipse-openj9/openj9/issues/10569 windows-all,aix-all
+java/lang/SecurityManager/CheckSecurityProvider.java https://github.com/eclipse-openj9/openj9/issues/23389 generic-all
 java/lang/StackTraceElement/PublicConstructor.java	https://github.com/eclipse-openj9/openj9/issues/6659	generic-all
 java/lang/StackTraceElement/SerialTest.java	https://github.com/eclipse-openj9/openj9/issues/6659	generic-all
 java/lang/StackWalker/Basic.java		https://github.com/eclipse-openj9/openj9/issues/6698	generic-all
