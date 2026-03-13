@@ -258,7 +258,7 @@ def setupParallelEnv() {
 					PARALLEL_OPTIONS = PARALLEL_OPTIONS_TEMP + " NUM_MACHINES=${MAX_NUM_MACHINES} TEST_TIME="
 					NUM_LIST = genParallelList(PARALLEL_OPTIONS)
 				} else if (env.JDK_IMPL == "openj9" || env.JDK_IMPL == "ibm") {
-					if (TARGET == "extended.jck" || TARGET == "special.system") {
+					if (TARGET == "sanity.jck" || TARGET == "extended.jck" || TARGET == "special.system") {
 						int minParallelNum = 10
 						if (PLATFORM.contains('windows')) {
 							minParallelNum = 15
