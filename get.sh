@@ -580,6 +580,47 @@ getOpenJDKSources() {
 	folder=`ls -d */`
 	mv $folder ../openjdk-jdk
 	cd ../
+
+	# Ensure test/lib directory exists for jtreg test library classes
+	# This is required for tests that use @library /test/lib directive
+	# The test/lib directory contains utility classes like jdk.test.lib.Utils
+	if [ -d "openjdk-jdk/test/lib" ]; then
+		echo "Test library directory found at openjdk-jdk/test/lib"
+		lib_file_count=$(find openjdk-jdk/test/lib -name "*.java" 2>/dev/null | wc -l)
+		echo "Found $lib_file_count Java files in test library"
+	else
+		echo "WARNING: Test library directory openjdk-jdk/test/lib not found in source archive"
+		echo "Attempting to locate test library from build workspace..."
+
+		# Try to find the test library in common build locations
+		# This handles cases where the source archive doesn't include test/lib
+		TEST_LIB_SOURCE=""
+		for possible_location in \
+			"$TESTDIR/../../../test/lib" \
+			"$TESTDIR/../../test/lib" \
+			"$TESTDIR/../test/lib" \
+			"$TEST_JDK_HOME/../test/lib" \
+			"/test/lib"
+		do
+			if [ -d "$possible_location" ] && [ -f "$possible_location/jdk/test/lib/Utils.java" ]; then
+				TEST_LIB_SOURCE="$possible_location"
+				echo "Found test library at: $TEST_LIB_SOURCE"
+				break
+			fi
+		done
+
+		if [ "$TEST_LIB_SOURCE" != "" ]; then
+			echo "Copying test library from $TEST_LIB_SOURCE to openjdk-jdk/test/lib"
+			mkdir -p openjdk-jdk/test
+			cp -r "$TEST_LIB_SOURCE" openjdk-jdk/test/
+			echo "Test library copied successfully"
+		else
+			echo "ERROR: Could not locate test library directory"
+			echo "Tests using @library /test/lib (e.g., SSLEngineTemplate.java) will fail to compile"
+			echo "Please ensure the source archive includes test/lib or the build workspace has test/lib available"
+		fi
+	fi
+
 	rm -rf src
 }
 
@@ -697,7 +738,7 @@ getFunctionalTestMaterial()
 	else
 		mv openj9/test/functional functional
 	fi
-   	
+
 	cd openj9
 	git rm -rqf .
 	git clean -fxd
@@ -754,7 +795,7 @@ getVendorTestMaterial() {
 				continue
 			fi
 		fi
-		
+
 		echo "git clone ${branchOption} $repoURL $dest"
 		git clone -q --depth 1 $branchOption $repoURL $dest
 
