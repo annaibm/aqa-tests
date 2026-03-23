@@ -1209,6 +1209,8 @@ def getJenkinsDomain() {
 }
 
 def getTestDependencyUrl() {
+    //temporary workaround for test dependency url, will be removed after test dependency url is available on Jenkins
+    return "https://openj9-jenkins.osuosl.org/job/test.getDependency/99999999/artifact/"
 	def jenkinsDomain = getJenkinsDomain()
 	if (jenkinsDomain.contains("hyc-runtimes")) {
 		jenkinsDomain = "openj9-jenkins.osuosl.org"
