@@ -269,9 +269,10 @@ def setupParallelEnv() {
 							PARALLEL_OPTIONS = PARALLEL_OPTIONS_TEMP + " NUM_MACHINES=${minParallelNum} TEST_TIME="
 							NUM_LIST = genParallelList(PARALLEL_OPTIONS)
 						}
-					} else if (TARGET == "sanity.functional" && PLATFORM.contains('windows')) {
+					} else if ((TARGET == "sanity.functional" && PLATFORM.contains('windows')) || (TARGET == "special.functional" && PLATFORM.contains('aix'))) {
 						if (NUM_LIST < 6) {
-							echo "Regenerate parallel list with NUM_MACHINES=6 for TARGET ${TARGET} due to long running tests (runtimes/automation/issues/654)."
+							def reason = TARGET == "sanity.functional" ? "due to long running tests (runtimes/automation/issues/654)" : "on AIX due to memory constraints (runtimes/automation/issues/921)"
+							echo "Regenerate parallel list with NUM_MACHINES=6 for TARGET ${TARGET} ${reason}."
 							PARALLEL_OPTIONS = PARALLEL_OPTIONS_TEMP + " NUM_MACHINES=6 TEST_TIME="
 							NUM_LIST = genParallelList(PARALLEL_OPTIONS)
 						}
