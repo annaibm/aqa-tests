@@ -16,6 +16,7 @@ import java.nio.charset.*;
 import java.nio.*;
 import java.util.*;
 import java.lang.reflect.*;
+import java.io.*;
 
 @SuppressWarnings("unchecked")
 public class CharsetsTest {
@@ -35,6 +36,12 @@ public class CharsetsTest {
     static Method ArrayEncoder_encodeFromUTF16 = null;
 
     static int err_cnt = 0;
+    static int tested_cnt = 0;
+    static int skipped_cnt = 0;
+    static boolean verbose = Boolean.getBoolean("charsets.verbose");
+    static int MAX_CONSOLE_ERRORS_PER_CHARSET = 10;
+    static int charset_err_cnt = 0;
+    static PrintWriter errorFile = null;
 
     static {
         try {
@@ -43,7 +50,7 @@ public class CharsetsTest {
             ArrayDecoder_decode = ArrayDecoder.getDeclaredMethod("decode",
                 byte[].class, int.class, int.class, char[].class);
             ArrayDecoder_decode.setAccessible(true);
-            
+
             // JDK 26+ uses encodeFromUTF16, earlier versions use encode
             if (JavaVersion.getFeature() >= 26) {
                 ArrayEncoder_encodeFromUTF16 = ArrayEncoder.getDeclaredMethod("encodeFromUTF16",
@@ -216,10 +223,27 @@ public class CharsetsTest {
                     throw new Exception(e.toString());
                 }
                 if (!(sb0.toString().equals(sb1.toString()))) {
-                    System.out.print(cd.charset().name()+":");
-                    for(byte b : ba) System.out.printf("\\x%02X",(int)b&0xFF);
-                    System.out.println(":"+sb0.toString()+"<>"+sb1.toString());
                     err_cnt++;
+                    charset_err_cnt++;
+
+                    // Always write to error file
+                    if (errorFile != null) {
+                        errorFile.print(cd.charset().name()+":");
+                        for(byte b : ba) errorFile.printf("\\x%02X",(int)b&0xFF);
+                        errorFile.println(":"+sb0.toString()+"<>"+sb1.toString());
+                    }
+
+                    // Print to console based on verbose flag or error limit
+                    if (verbose || charset_err_cnt <= MAX_CONSOLE_ERRORS_PER_CHARSET) {
+                        if (charset_err_cnt == 1) {
+                            System.out.println("\n=== Decoding Errors in " + cd.charset().name() + " ===");
+                        }
+                        System.out.print("  ");
+                        for(byte b : ba) System.out.printf("\\x%02X",(int)b&0xFF);
+                        System.out.println(":"+sb0.toString()+"<>"+sb1.toString());
+                    } else if (charset_err_cnt == MAX_CONSOLE_ERRORS_PER_CHARSET + 1) {
+                        System.out.println("  ... further errors for " + cd.charset().name() + " written to charset_errors.txt");
+                    }
                 }
             }
         } else {
@@ -239,10 +263,10 @@ public class CharsetsTest {
             }
             char[] ca = Character.toChars(i);
             ce.reset();
-            
+
             byte[] ba = new byte[(int)Math.ceil(ce.maxBytesPerChar()*ca.length)];
             int len;
-            
+
             // JDK 26+ uses encodeFromUTF16, earlier versions use encode
             if (JavaVersion.getFeature() >= 26) {
                 // Convert char[] to UTF-16 LE byte array for the new API
@@ -267,31 +291,60 @@ public class CharsetsTest {
                  throw new Exception(e.toString());
             }
             if (!(sb0.toString().equals(sb1.toString()))) {
-                System.out.println(ce.charset().name()+":");
-                for(char c : ca) System.out.printf("\\u%04X",(int)c);
-                System.out.println(":"+sb0.toString()+"<>"+sb1.toString());
                 err_cnt++;
+                charset_err_cnt++;
+
+                // Always write to error file
+                if (errorFile != null) {
+                    errorFile.print(ce.charset().name()+":");
+                    for(char c : ca) errorFile.printf("\\u%04X",(int)c);
+                    errorFile.println(":"+sb0.toString()+"<>"+sb1.toString());
+                }
+
+                // Print to console based on verbose flag or error limit
+                if (verbose || charset_err_cnt <= MAX_CONSOLE_ERRORS_PER_CHARSET) {
+                    if (charset_err_cnt == 1) {
+                        System.out.println("\n=== Encoding Errors in " + ce.charset().name() + " ===");
+                    }
+                    System.out.print("  ");
+                    for(char c : ca) System.out.printf("\\u%04X",(int)c);
+                    System.out.println(":"+sb0.toString()+"<>"+sb1.toString());
+                } else if (charset_err_cnt == MAX_CONSOLE_ERRORS_PER_CHARSET + 1) {
+                    System.out.println("  ... further errors for " + ce.charset().name() + " written to charset_errors.txt");
+                }
             }
         }
     }
 
     static void charset_test(Charset charset) throws Exception {
         if (!charset.canEncode()) {
-            System.out.println("Encoder is not supported by charset "+charset.name()+". Skipping..." );
+            if (verbose) {
+                System.out.println("Skipping " + charset.name() + ": Encoder not supported");
+            }
+            skipped_cnt++;
             return;
         }
         if (isUnicodeConverter(charset)) {
-            System.out.println("Charset "+charset.name()+" is Unicode compatible charset. Skipping..." );
+            if (verbose) {
+                System.out.println("Skipping " + charset.name() + ": Unicode compatible charset");
+            }
+            skipped_cnt++;
             return;
         }
         CharsetDecoder cd = charset.newDecoder();
         CharsetEncoder ce = charset.newEncoder();
         if (!(ArrayDecoder.isInstance(cd)) || !(ArrayEncoder.isInstance(ce))) {
-            System.out.println("Charset "+charset.name()+
-                " does not support ArrayDecoder and/or ArrayEncoder interface. Skipping..." );
+            if (verbose) {
+                System.out.println("Skipping " + charset.name() + ": ArrayDecoder/ArrayEncoder not supported");
+            }
+            skipped_cnt++;
             return;
         }
-        System.out.println(charset.name());
+        tested_cnt++;
+        charset_err_cnt = 0; // Reset error counter for this charset
+        if (verbose) {
+            System.out.println("Testing charset: " + charset.name());
+        }
         cd.onMalformedInput(CodingErrorAction.REPLACE).onUnmappableCharacter(CodingErrorAction.REPLACE);
         ce.onMalformedInput(CodingErrorAction.REPLACE).onUnmappableCharacter(CodingErrorAction.REPLACE);
         // Decoder
@@ -299,11 +352,13 @@ public class CharsetsTest {
         for(int i=0; i< objs.length; i++) {
             TreeSet<Integer>[] sets = (TreeSet<Integer>[]) objs[i];
             if (sets[0].size() == 0) continue;
-            for(int j=0; j<sets.length; j++) {
-                if (0 == sets[j].size()) continue;
-                System.out.printf("[\\x%02X-\\x%02X]",sets[j].first(),sets[j].last());
+            if (verbose) {
+                for(int j=0; j<sets.length; j++) {
+                    if (0 == sets[j].size()) continue;
+                    System.out.printf("  [\\x%02X-\\x%02X]",sets[j].first(),sets[j].last());
+                }
+                System.out.println();
             }
-            System.out.println();
             decode_data(cd, 0, new byte[sets.length], sets);
         }
         // Encoder
@@ -311,16 +366,53 @@ public class CharsetsTest {
     }
 
     public static void main(String[] args) throws Exception {
-        if (args.length > 0) {
-            for(String csName : args) {
-                charset_test(Charset.forName(csName));
+        System.out.println("Starting MBCS Charsets Test..." + (verbose ? " (verbose mode enabled)" : ""));
+
+        if (verbose) {
+            System.out.println("WARNING: Verbose mode enabled - console output may be very large if there are many errors.");
+            System.out.println("Do not use verbose mode in CI runs.");
+        }
+
+        // Initialize error file in test output directory
+        try {
+            String outputDir = System.getProperty("test.output.dir", ".");
+            errorFile = new PrintWriter(new FileWriter(outputDir + "/charset_errors.txt"));
+        } catch (IOException e) {
+            System.err.println("Warning: Could not create charset_errors.txt: " + e.getMessage());
+        }
+
+        try {
+            if (args.length > 0) {
+                System.out.println("Testing specified charsets: " + args.length);
+                for(String csName : args) {
+                    charset_test(Charset.forName(csName));
+                }
+            } else {
+                int totalCharsets = Charset.availableCharsets().size();
+                System.out.println("Testing all available charsets: " + totalCharsets);
+                for(Charset charset : Charset.availableCharsets().values()) {
+                    charset_test(charset);
+                }
             }
-        } else {
-            for(Charset charset : Charset.availableCharsets().values()) {
-                charset_test(charset);
+        } finally {
+            // Close error file
+            if (errorFile != null) {
+                errorFile.flush();
+                errorFile.close();
             }
         }
-        System.out.printf("Test: %s%n", err_cnt > 0 ? "failed" : "OK");
+
+        System.out.println("\n=== Test Summary ===");
+        System.out.println("Charsets tested: " + tested_cnt);
+        System.out.println("Charsets skipped: " + skipped_cnt);
+        System.out.println("Errors found: " + err_cnt);
+        if (err_cnt > 0) {
+            System.out.println("Full error details written to: charset_errors.txt");
+        }
+        System.out.printf("Test Result: %s%n", err_cnt > 0 ? "FAILED" : "PASSED");
+        if (!verbose && err_cnt == 0) {
+            System.out.println("\nNote: Run with -Dcharsets.verbose=true for detailed output");
+        }
         System.exit(err_cnt > 0 ? 1 : 0);
     }
 }
