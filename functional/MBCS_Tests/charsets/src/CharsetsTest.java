@@ -39,8 +39,12 @@ public class CharsetsTest {
     static int tested_cnt = 0;
     static int skipped_cnt = 0;
     static boolean verbose = Boolean.getBoolean("charsets.verbose");
-    static int MAX_CONSOLE_ERRORS_PER_CHARSET = 10;
-    static int charset_err_cnt = 0;
+    static boolean debugFile = Boolean.getBoolean("charsets.debug.file");
+    private static final int MAX_CONSOLE_ERRORS_PER_CHARSET = 10;
+    private static final int MAX_FILE_ERRORS_PER_CHARSET = 1000;
+    static int charset_decode_err_cnt = 0;
+    static int charset_encode_err_cnt = 0;
+    static int charset_file_err_cnt = 0;
     static PrintWriter errorFile = null;
 
     static {
@@ -224,25 +228,32 @@ public class CharsetsTest {
                 }
                 if (!(sb0.toString().equals(sb1.toString()))) {
                     err_cnt++;
-                    charset_err_cnt++;
+                    charset_decode_err_cnt++;
 
-                    // Always write to error file
-                    if (errorFile != null) {
+                    // Write to error file with limit (unless debugFile mode is enabled)
+                    if (errorFile != null && (debugFile || charset_file_err_cnt < MAX_FILE_ERRORS_PER_CHARSET)) {
                         errorFile.print(cd.charset().name()+":");
                         for(byte b : ba) errorFile.printf("\\x%02X",(int)b&0xFF);
                         errorFile.println(":"+sb0.toString()+"<>"+sb1.toString());
+                        if (!debugFile) {
+                            charset_file_err_cnt++;
+                        }
                     }
 
                     // Print to console based on verbose flag or error limit
-                    if (verbose || charset_err_cnt <= MAX_CONSOLE_ERRORS_PER_CHARSET) {
-                        if (charset_err_cnt == 1) {
+                    if (verbose || charset_decode_err_cnt <= MAX_CONSOLE_ERRORS_PER_CHARSET) {
+                        if (charset_decode_err_cnt == 1) {
                             System.out.println("\n=== Decoding Errors in " + cd.charset().name() + " ===");
                         }
                         System.out.print("  ");
                         for(byte b : ba) System.out.printf("\\x%02X",(int)b&0xFF);
                         System.out.println(":"+sb0.toString()+"<>"+sb1.toString());
-                    } else if (charset_err_cnt == MAX_CONSOLE_ERRORS_PER_CHARSET + 1) {
-                        System.out.println("  ... further errors for " + cd.charset().name() + " written to charset_errors.txt");
+                    } else if (charset_decode_err_cnt == MAX_CONSOLE_ERRORS_PER_CHARSET + 1) {
+                        if (errorFile != null) {
+                            System.out.println("  ... further decoding errors for " + cd.charset().name() + " written to charset_errors.txt");
+                        } else {
+                            System.out.println("  ... further decoding errors for " + cd.charset().name() + " not shown");
+                        }
                     }
                 }
             }
@@ -292,25 +303,32 @@ public class CharsetsTest {
             }
             if (!(sb0.toString().equals(sb1.toString()))) {
                 err_cnt++;
-                charset_err_cnt++;
+                charset_encode_err_cnt++;
 
-                // Always write to error file
-                if (errorFile != null) {
+                // Write to error file with limit (unless debugFile mode is enabled)
+                if (errorFile != null && (debugFile || charset_file_err_cnt < MAX_FILE_ERRORS_PER_CHARSET)) {
                     errorFile.print(ce.charset().name()+":");
                     for(char c : ca) errorFile.printf("\\u%04X",(int)c);
                     errorFile.println(":"+sb0.toString()+"<>"+sb1.toString());
+                    if (!debugFile) {
+                        charset_file_err_cnt++;
+                    }
                 }
 
                 // Print to console based on verbose flag or error limit
-                if (verbose || charset_err_cnt <= MAX_CONSOLE_ERRORS_PER_CHARSET) {
-                    if (charset_err_cnt == 1) {
+                if (verbose || charset_encode_err_cnt <= MAX_CONSOLE_ERRORS_PER_CHARSET) {
+                    if (charset_encode_err_cnt == 1) {
                         System.out.println("\n=== Encoding Errors in " + ce.charset().name() + " ===");
                     }
                     System.out.print("  ");
                     for(char c : ca) System.out.printf("\\u%04X",(int)c);
                     System.out.println(":"+sb0.toString()+"<>"+sb1.toString());
-                } else if (charset_err_cnt == MAX_CONSOLE_ERRORS_PER_CHARSET + 1) {
-                    System.out.println("  ... further errors for " + ce.charset().name() + " written to charset_errors.txt");
+                } else if (charset_encode_err_cnt == MAX_CONSOLE_ERRORS_PER_CHARSET + 1) {
+                    if (errorFile != null) {
+                        System.out.println("  ... further encoding errors for " + ce.charset().name() + " written to charset_errors.txt");
+                    } else {
+                        System.out.println("  ... further encoding errors for " + ce.charset().name() + " not shown");
+                    }
                 }
             }
         }
@@ -341,7 +359,9 @@ public class CharsetsTest {
             return;
         }
         tested_cnt++;
-        charset_err_cnt = 0; // Reset error counter for this charset
+        charset_decode_err_cnt = 0; // Reset error counters for this charset
+        charset_encode_err_cnt = 0;
+        charset_file_err_cnt = 0;
         if (verbose) {
             System.out.println("Testing charset: " + charset.name());
         }
@@ -371,6 +391,12 @@ public class CharsetsTest {
         if (verbose) {
             System.out.println("WARNING: Verbose mode enabled - console output may be very large if there are many errors.");
             System.out.println("Do not use verbose mode in CI runs.");
+        }
+
+        if (debugFile) {
+            System.out.println("DEBUG FILE MODE: Uncapped error file output enabled.");
+            System.out.println("This mode writes all errors to charset_errors.txt without limit.");
+            System.out.println("Safe for CI use as it does not affect console output.");
         }
 
         // Initialize error file in test output directory
@@ -406,12 +432,21 @@ public class CharsetsTest {
         System.out.println("Charsets tested: " + tested_cnt);
         System.out.println("Charsets skipped: " + skipped_cnt);
         System.out.println("Errors found: " + err_cnt);
-        if (err_cnt > 0) {
-            System.out.println("Full error details written to: charset_errors.txt");
+        if (err_cnt > 0 && errorFile != null) {
+            String outputDir = System.getProperty("test.output.dir", ".");
+            System.out.println("Error details written to: " + outputDir + "/charset_errors.txt");
+            if (debugFile) {
+                System.out.println("(All errors written - debug.file mode enabled)");
+            } else {
+                System.out.println("(Limited to " + MAX_FILE_ERRORS_PER_CHARSET + " errors per charset to prevent excessive file size)");
+            }
+        } else if (err_cnt > 0) {
+            System.out.println("Note: Error file could not be created. Errors were only shown on console.");
         }
         System.out.printf("Test Result: %s%n", err_cnt > 0 ? "FAILED" : "PASSED");
-        if (!verbose && err_cnt == 0) {
-            System.out.println("\nNote: Run with -Dcharsets.verbose=true for detailed output");
+        if (!verbose && !debugFile && err_cnt == 0) {
+            System.out.println("\nNote: Run with -Dcharsets.verbose=true for detailed console output");
+            System.out.println("      or -Dcharsets.debug.file=true for uncapped file output (CI-safe)");
         }
         System.exit(err_cnt > 0 ? 1 : 0);
     }
