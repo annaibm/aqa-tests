@@ -172,7 +172,7 @@ def generateJobs(jobJdkVersion, jobTestFlag, jobPlatforms, jobTargets, jobParall
                             suffix = "_f3_strong"
                         } else if (jobTestFlag == "FIPS140_3_OpenJCEPlusFIPS.FIPS140-3") {
                             suffix = "_f3_strict"
-                        } else if (jobTestFlag == "FIPS140_3_OpenJcePlusFIPS") {
+                        } else if (jobTestFlag == "FIPS140_3_OpenJCEPlusFIPS") {
                             suffix = "_f3_weak"
                         } else {
                             suffix = "_" + jobTestFlag.toLowerCase().trim()
