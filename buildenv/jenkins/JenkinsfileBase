@@ -921,17 +921,20 @@ def checkTestResults(results) {
 		summary.appendText("<li><b>$it.key</b> : $it.value</li>", false)
 	}
 	summary.appendText("</ul>", false)
-    def tapFiles = findFiles(glob: "aqa-tests/TKG/**/*.tap")
-    if (tapFiles && tapFiles.size() > 1) {
-        summary.appendText("<b>TAP files:</b><ul>", false)
+    def tapFiles = findFiles(glob: "aqa-tests/TKG/**/output_*/*.tap")
+    if (tapFiles && tapFiles.size() > 0) {
+        def tapBlock = "<b>TAP files:</b><ul>"
         tapFiles.each { tapFile ->
             def content = readFile(file: "${tapFile}")
             boolean hasFail = content.contains("not ok")
-            def icon = hasFail ? "&#9888;" : "&#9989;"  // ⚠️ or ✅
+            def iconUrl = hasFail
+                ? "${JENKINS_URL}static/images/16x16/yellow.png"
+                : "${JENKINS_URL}static/images/16x16/blue.png"
             def tapLink = "${BUILD_URL}artifact/${tapFile}"
-            summary.appendText("<li>${icon} <a href='${tapLink}'>${tapFile.name}</a></li>", false)
+            tapBlock += "<li><img src='${iconUrl}' /> <a href='${tapLink}'>${tapFile.path}</a></li>"
         }
-        summary.appendText("</ul>", false)
+        tapBlock += "</ul>"
+        currentBuild.description = tapBlock + "<br>" + currentBuild.description
     }
 }
 
