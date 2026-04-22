@@ -923,11 +923,12 @@ def checkTestResults(results) {
 	summary.appendText("</ul>", false)
     def tapFiles = findFiles(glob: "aqa-tests/TKG/**/output_*/*.tap")
     def tapFiles = findFiles(glob: "aqa-tests/TKG/**/output_*/*.tap")
-    if (tapFiles && tapFiles.size() > 0) {
+    def iterationTapFiles = findFiles(glob: "aqa-tests/TKG/**/output_*/*.tap")
+    if (iterationTapFiles && iterationTapFiles.size() > 0) {
+        def failedTaps = env.FAILED_TAP_FILES ? env.FAILED_TAP_FILES.split(",") as List : []
         def tapTable = "<table><tr><th>TAP file</th><th>Status</th></tr>"
-        tapFiles.each { tapFile ->
-            def content = readFile(file: "${tapFile}")
-            boolean hasFail = content.contains("not ok")
+        iterationTapFiles.each { tapFile ->
+            boolean hasFail = failedTaps.any { it.contains(tapFile.path) }
             def badgeUrl = hasFail
                 ? "${JENKINS_URL}buildStatus/icon?job=_&build=_&style=flat-square&subject=tap&status=unstable&color=yellow"
                 : "${JENKINS_URL}buildStatus/icon?job=_&build=_&style=flat-square&subject=tap&status=passing&color=brightgreen"
