@@ -931,7 +931,8 @@ def checkTestResults(results) {
                 ? "<span style='background-color:#e6a817;color:white;padding:2px 6px;border-radius:3px;font-size:11px'>unstable</span>"
                 : "<span style='background-color:#44cc11;color:white;padding:2px 6px;border-radius:3px;font-size:11px'>passing</span>"
             def tapLink = "${BUILD_URL}artifact/${tapFile}"
-            tapTable += "<tr><td><a href='${tapLink}'>${tapFile.path}</a></td><td>${badge}</td></tr>"
+            def displayName = tapFile.path.replace("aqa-tests/TKG/", "")
+            tapTable += "<tr><td><a href='${tapLink}'>${displayName}</a></td><td>${badge}</td></tr>"
         }
         tapTable += "</table>"
         currentBuild.description = currentBuild.description + "<br>" + tapTable
