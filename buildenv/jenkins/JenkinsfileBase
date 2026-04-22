@@ -922,19 +922,25 @@ def checkTestResults(results) {
 	}
 	summary.appendText("</ul>", false)
     def tapFiles = findFiles(glob: "aqa-tests/TKG/**/output_*/*.tap")
+    def tapFiles = findFiles(glob: "aqa-tests/TKG/**/output_*/*.tap")
     if (tapFiles && tapFiles.size() > 0) {
-        def tapBlock = "<b>TAP files:</b><ul>"
+        def tapTable = "<table><tr><th>TAP file</th><th>Status</th></tr>"
         tapFiles.each { tapFile ->
             def content = readFile(file: "${tapFile}")
             boolean hasFail = content.contains("not ok")
-            def iconUrl = hasFail
-                ? "${JENKINS_URL}static/images/16x16/yellow.png"
-                : "${JENKINS_URL}static/images/16x16/blue.png"
+            def badgeUrl = hasFail
+                ? "${JENKINS_URL}buildStatus/icon?job=_&build=_&style=flat-square&subject=tap&status=unstable&color=yellow"
+                : "${JENKINS_URL}buildStatus/icon?job=_&build=_&style=flat-square&subject=tap&status=passing&color=brightgreen"
             def tapLink = "${BUILD_URL}artifact/${tapFile}"
-            tapBlock += "<li><img src='${iconUrl}' /> <a href='${tapLink}'>${tapFile.path}</a></li>"
+            tapTable += """
+                <tr>
+                    <td><a href="${tapLink}">${tapFile.path}</a></td>
+                    <td><img src="${badgeUrl}" /></td>
+                </tr>
+            """
         }
-        tapBlock += "</ul>"
-        currentBuild.description = tapBlock + "<br>" + currentBuild.description
+        tapTable += "</table>"
+        currentBuild.description = tapTable + "<br>" + currentBuild.description
     }
 }
 
