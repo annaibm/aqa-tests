@@ -926,7 +926,7 @@ def checkTestResults(results) {
         def failedTaps = env.FAILED_TAP_FILES ? env.FAILED_TAP_FILES.split(",") as List : []
         def tapTable = "<table><tr><th>TAP file</th><th>Status</th></tr>"
         iterationTapFiles.each { tapFile ->
-            boolean hasFail = failedTaps.any { it.contains(tapFile.path) }
+            boolean hasFail = (env.jobStatus == 'UNSTABLE' || env.jobStatus == 'FAILURE')
             def badge = hasFail
                 ? "<span style='background-color:#e6a817;color:white;padding:2px 6px;border-radius:3px;font-size:11px'>unstable</span>"
                 : "<span style='background-color:#44cc11;color:white;padding:2px 6px;border-radius:3px;font-size:11px'>passing</span>"
@@ -1713,7 +1713,9 @@ def archiveChildJobTap(childJobs, originalStatus = 'SUCCESS') {
 					def badgeUrl = "${childBuildUrl}/badge/icon"
 					def tapBadgeUrl = childResult == 'UNSTABLE'
 						? "${childBuildUrl}/badge/icon?subject=tap&status=unstable&color=yellow"
-						: "${childBuildUrl}/badge/icon?subject=tap&status=passing&color=brightgreen"
+						: (childResult == 'ABORTED' || childResult == 'FAILURE')
+							? "${childBuildUrl}/badge/icon?subject=tap&status=${childResult.toLowerCase()}&color=red"
+							: "${childBuildUrl}/badge/icon?subject=tap&status=passing&color=brightgreen"
 					def duration = cjob.getDuration() ?: ""
 					if (duration) {
 						long totalMillis = duration as long
