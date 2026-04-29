@@ -47,22 +47,74 @@ timestamps{
 
                     if (SDK_RESOURCE == "customized" ) {
                         if (params.TOP_LEVEL_SDK_URL) {
+                            // Try new Semeru release structure first (TAP files at root)
+                            // example: <jenkins_url>/job/AQA_Test_Pipeline_Release/473/artifact/*zip*/archive.zip
+                            // Then fall back to old structure with subdirectories
                             // example: <jenkins_url>/job/build-scripts/job/openjdk17-pipeline-IBM/354/artifact/target/linux/s390x/openj9/AQAvitTaps/*zip*/AQAvitTaps.zip
 
-                            download_url = params.TOP_LEVEL_SDK_URL + "artifact/target/${os}/${arch}/${params.VARIANT}/AQAvitTaps/*zip*/AQAvitTaps.zip"
                             dir("${WORKSPACE}") {
                                 env.PLATFORM = PLATFORM
                                 def PLATFORM_DIR = params.PLATFORM_DIR ? "${params.PLATFORM_DIR}" : "${PLATFORM}"
-                                def aqaTapCmd = "${WORKSPACE}/aqaTap.sh -u ${download_url} -p ${PLATFORM_DIR}"
+
+                                // Try new structure (Semeru release - TAP files at root)
+                                def new_structure_url = params.TOP_LEVEL_SDK_URL + "artifact/*zip*/archive.zip"
+                                def old_structure_url = params.TOP_LEVEL_SDK_URL + "artifact/target/${os}/${arch}/${params.VARIANT}/AQAvitTaps/*zip*/AQAvitTaps.zip"
+
+                                // Check which structure exists by trying to download
+                                def download_success = false
+
+                                // Try new structure first
                                 if (params.CUSTOMIZED_SDK_URL_CREDENTIAL_ID) {
-                                    // USERNAME and PASSWORD reference with a withCredentials block will not be visible within job output
                                     withCredentials([usernamePassword(credentialsId: "${params.CUSTOMIZED_SDK_URL_CREDENTIAL_ID}", usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                                        sh "$aqaTapCmd"
+                                        def check_new = sh(script: "curl -u \$USERNAME:\$PASSWORD -I -L -s -o /dev/null -w '%{http_code}' '${new_structure_url}'", returnStdout: true).trim()
+                                        if (check_new == "200") {
+                                            echo "Using new Semeru release structure (TAP files at root)"
+                                            download_url = new_structure_url
+                                            // Download and extract all TAP files, then filter by platform
+                                            sh "curl -u \$USERNAME:\$PASSWORD -L -o archive.zip '${download_url}'"
+                                            sh "unzip -q archive.zip -d temp_extract || true"
+                                            sh "mkdir -p AQAvitTapFiles/${PLATFORM_DIR}"
+                                            // Find and copy TAP files for this platform
+                                            sh """
+                                                find temp_extract -name '*_${PLATFORM}.tap' -o -name '*_${PLATFORM}_*.tap' | while read file; do
+                                                    cp "\$file" "AQAvitTapFiles/${PLATFORM_DIR}/" 2>/dev/null || true
+                                                done
+                                            """
+                                            sh "rm -rf temp_extract archive.zip"
+                                            download_success = true
+                                        }
                                     }
                                 } else {
-                                    sh "$aqaTapCmd"
+                                    def check_new = sh(script: "curl -I -L -s -o /dev/null -w '%{http_code}' '${new_structure_url}'", returnStdout: true).trim()
+                                    if (check_new == "200") {
+                                        echo "Using new Semeru release structure (TAP files at root)"
+                                        download_url = new_structure_url
+                                        sh "curl -L -o archive.zip '${download_url}'"
+                                        sh "unzip -q archive.zip -d temp_extract || true"
+                                        sh "mkdir -p AQAvitTapFiles/${PLATFORM_DIR}"
+                                        sh """
+                                            find temp_extract -name '*_${PLATFORM}.tap' -o -name '*_${PLATFORM}_*.tap' | while read file; do
+                                                cp "\$file" "AQAvitTapFiles/${PLATFORM_DIR}/" 2>/dev/null || true
+                                            done
+                                        """
+                                        sh "rm -rf temp_extract archive.zip"
+                                        download_success = true
+                                    }
                                 }
 
+                                // If new structure didn't work, try old structure
+                                if (!download_success) {
+                                    echo "Using old structure (TAP files in subdirectories)"
+                                    download_url = old_structure_url
+                                    def aqaTapCmd = "${WORKSPACE}/aqaTap.sh -u ${download_url} -p ${PLATFORM_DIR}"
+                                    if (params.CUSTOMIZED_SDK_URL_CREDENTIAL_ID) {
+                                        withCredentials([usernamePassword(credentialsId: "${params.CUSTOMIZED_SDK_URL_CREDENTIAL_ID}", usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                                            sh "$aqaTapCmd"
+                                        }
+                                    } else {
+                                        sh "$aqaTapCmd"
+                                    }
+                                }
                             }
                         }
                     }
