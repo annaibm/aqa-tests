@@ -916,6 +916,13 @@ def checkTestResults(results) {
 		summary = manager.createSummary("accept.svg")
 	}
 
+	// Skip TEST TARGETS SUMMARY for Grinder iteration jobs (when parent has multiple iterations)
+	if (ITERATIONS > 1 || env.TKG_ITERATIONS.toInteger() > 1) {
+		// skip TEST TARGETS SUMMARY — results reflect only last iteration
+		echo "Skipping TEST TARGETS SUMMARY: multiple iterations, summary may not reflect all results."
+		return
+	}
+
 	summary.appendText("TEST TARGETS SUMMARY:<ul>", false)
 	results.each {
 		summary.appendText("<li><b>$it.key</b> : $it.value</li>", false)
