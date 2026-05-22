@@ -4,10 +4,10 @@ def JOBS =[:]
 
 // read JSON from perfConfig file
 def perfConfigJson = []
-if (params.PERFCONFIG_JSON) { 
-        echo "Read JSON from PERFCONFIG_JSON parameter..." 
+if (params.PERFCONFIG_JSON) {
+        echo "Read JSON from PERFCONFIG_JSON parameter..."
         perfConfigJson = readJSON text: "${params.PERFCONFIG_JSON}"
-} else { 
+} else {
         node("ci.role.test&&hw.arch.x86&&sw.os.linux") {
                 checkout scm
                 dir (env.WORKSPACE) {
@@ -22,6 +22,7 @@ if (params.PERFCONFIG_JSON) {
                                 def statusCode = -1
                                 sshagent (credentials: ["$params.USER_CREDENTIALS_ID"], ignoreMissing: true) {
                                         statusCode =  sh returnStatus: true, script: """
+                                        rm -rf ${vendorRepoDir}
                                         git clone -q --depth 1 -b ${params.VENDOR_TEST_BRANCHES} ${params.VENDOR_TEST_REPOS} ${vendorRepoDir}
                                         """
                                 }
@@ -55,7 +56,7 @@ params.each { param ->
 }
 node("worker || (ci.role.test&&hw.arch.x86&&sw.os.linux)") {
         perfConfigJson.each { item ->
-                def BENCHMARK = item.BENCHMARK 
+                def BENCHMARK = item.BENCHMARK
                 def TARGET = item.TARGET
                 def BUILD_LIST = item.BUILD_LIST
                 def PLATMACHINE_MAP = item.PLAT_MACHINE_MAP
@@ -64,9 +65,9 @@ node("worker || (ci.role.test&&hw.arch.x86&&sw.os.linux)") {
                 baseParams << string(name: "TARGET", value: item.TARGET)
                 baseParams << string(name: "BUILD_LIST", value: item.BUILD_LIST)
                 baseParams << string(name: "PERF_ITERATIONS", value: item.PERF_ITERATIONS ? item.PERF_ITERATIONS.toString() : "4")
-                
-                item.PLAT_MACHINE_MAP.each { kv -> 
-                        kv.each {p, m -> 
+
+                item.PLAT_MACHINE_MAP.each { kv ->
+                        kv.each {p, m ->
                                 // Clone baseParams to avoid mutation
                                 def thisChildParams = baseParams.collect()
                                 thisChildParams << string(name: "PLATFORM", value: p)
@@ -97,9 +98,9 @@ node("worker || (ci.role.test&&hw.arch.x86&&sw.os.linux)") {
 parallel JOBS
 
 def createPerfL2Job(String jobName, String platform, String benchmark) {
-        def jobParams = [:] 
+        def jobParams = [:]
         jobParams.put('TEST_JOB_NAME', jobName)
-        jobParams.put('PLATFORM', platform) 
+        jobParams.put('PLATFORM', platform)
         jobParams.put('BENCHMARK', benchmark)
         def templatePath = 'aqa-tests/buildenv/jenkins/perf/perfL2JobTemplate'
         if (!fileExists(templatePath)) {
