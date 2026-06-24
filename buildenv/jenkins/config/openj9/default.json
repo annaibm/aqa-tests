@@ -32,7 +32,7 @@
                 "KEEP_REPORTDIR": true,
                 "VENDOR_TEST_REPOS": "git@github.ibm.com:runtimes/test.git",
                 "VENDOR_TEST_BRANCHES": "master",
-                "VENDOR_TEST_DIRS": "functional"
+                "VENDOR_TEST_DIRS": ""
             },
             "FIPS": {
                 "RERUN_ITERATIONS": "0"
