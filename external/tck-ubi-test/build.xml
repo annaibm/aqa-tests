@@ -1,10 +1,9 @@
 <?xml version="1.0"?>
 <project name="tck-ubi-test" default="build" basedir=".">
-	<taskdef resource="net/sf/antcontrib/antlib.xml" />
 	<description>
 		Build tck-ubi-test Docker image
 	</description>
-	<import file="${TEST_ROOT}/external/build.xml"/>
+	<import file="${TEST_ROOT}/external/external-targets.xml"/>
 	<import file="${TEST_ROOT}/jck/build.xml"/>
 
 	<!-- set properties for this build -->

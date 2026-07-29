@@ -1,10 +1,9 @@
 <?xml version="1.0"?>
 <project name="criu-ubi-portable-checkpoint" default="build" basedir=".">
-	<taskdef resource="net/sf/antcontrib/antlib.xml" />
 	<description>
 		Build criu-ubi-portable-checkpoint Test
 	</description>
-	<import file="${TEST_ROOT}/external/build.xml"/>
+	<import file="${TEST_ROOT}/external/external-targets.xml"/>
 
 	<!-- set properties for this build -->
 	<property name="TEST" value="criu-ubi-portable-checkpoint" />
