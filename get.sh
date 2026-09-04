@@ -40,6 +40,8 @@ CURL_OPTS="s"
 CODE_COVERAGE=false
 ADDITIONAL_ARTIFACTS_REQUIRED=""
 SETUP_JCK_RUN="false"
+GIT_BIN=$(command -v git || echo /opt/freeware/bin/git)
+export GIT_BIN
 
 usage ()
 {
@@ -597,7 +599,7 @@ getTestKitGen()
 		TKG_REPO="https://github.com/adoptium/TKG.git"
 	fi
 
-	executeCmdWithRetry "TKG" "git clone -q $TKG_REPO"
+	executeCmdWithRetry "TKG" "${GIT_BIN} clone -q $TKG_REPO"
 	rt_code=$?
 	if [ $rt_code != 0 ]; then
 		echo "git clone error code: $rt_code"
@@ -606,13 +608,13 @@ getTestKitGen()
 
 	cd TKG
 	echo "git rev-parse $TKG_BRANCH"
-	if ! tkg_sha=(`git rev-parse $TKG_BRANCH`); then
+	if ! tkg_sha=(`${GIT_BIN} rev-parse $TKG_BRANCH`); then
 		echo "git rev-parse origin/$TKG_BRANCH"
-		tkg_sha=(`git rev-parse origin/$TKG_BRANCH`)
+		tkg_sha=(`${GIT_BIN} rev-parse origin/$TKG_BRANCH`)
 	fi
 
 	echo "git checkout -q -f $tkg_sha"
-	git checkout -q -f $tkg_sha
+	${GIT_BIN} checkout -q -f $tkg_sha
 
 }
 
@@ -665,7 +667,7 @@ getFunctionalTestMaterial()
 		OPENJ9_BRANCH="-b $OPENJ9_BRANCH"
 	fi
 
-	executeCmdWithRetry "openj9" "git clone --depth 1 --reference-if-able ${HOME}/openjdk_cache $OPENJ9_BRANCH $OPENJ9_REPO"
+	executeCmdWithRetry "openj9" "${GIT_BIN} clone --depth 1 --reference-if-able ${HOME}/openjdk_cache $OPENJ9_BRANCH $OPENJ9_REPO"
 	rt_code=$?
 	if [ $rt_code != 0 ]; then
 		echo "git clone error code: $rt_code"
@@ -676,18 +678,18 @@ getFunctionalTestMaterial()
 	then
 		echo "update to openj9 sha: $OPENJ9_SHA"
 		cd openj9
-		executeCmdWithRetry "" "git fetch -q --unshallow"
-		if ! git checkout $OPENJ9_SHA; then
+		executeCmdWithRetry "" "${GIT_BIN} fetch -q --unshallow"
+		if ! ${GIT_BIN} checkout $OPENJ9_SHA; then
 			echo "SHA not yet found. Continue fetching PR refs and tags..."
 			echo "git fetch -q --tags $OPENJ9_REPO +refs/pull/*:refs/remotes/origin/pr/*"
-			git fetch -q --tags $OPENJ9_REPO +refs/pull/*:refs/remotes/origin/pr/*
+			${GIT_BIN} fetch -q --tags $OPENJ9_REPO +refs/pull/*:refs/remotes/origin/pr/*
 			echo "git checkout -q $OPENJ9_SHA"
-			if ! git checkout $OPENJ9_SHA; then
+			if ! ${GIT_BIN} checkout $OPENJ9_SHA; then
 				echo "SHA not yet found. Continue fetching all the branches on origin..."
 				echo "git fetch -q --tags $OPENJ9_REPO +refs/heads/*:refs/remotes/origin/*"
-				git fetch -q --tags $OPENJ9_REPO +refs/heads/*:refs/remotes/origin/*
+				${GIT_BIN} fetch -q --tags $OPENJ9_REPO +refs/heads/*:refs/remotes/origin/*
 				echo "git checkout -q $OPENJ9_SHA"
-				git checkout $OPENJ9_SHA
+				${GIT_BIN} checkout $OPENJ9_SHA
 			fi
 		fi
 		cd $TESTDIR
@@ -705,8 +707,8 @@ getFunctionalTestMaterial()
 	fi
    	
 	cd openj9
-	git rm -rqf .
-	git clean -fxd
+	${GIT_BIN} rm -rqf .
+	${GIT_BIN} clean -fxd
 	cd $TESTDIR
 }
 
@@ -822,14 +824,14 @@ getVendorTestMaterial() {
 		fi
 		
 		echo "git clone ${branchOption} $repoURL $dest"
-		git clone -q --depth 1 $branchOption $repoURL $dest
+		${GIT_BIN} clone -q --depth 1 $branchOption $repoURL $dest
 
 		if [ "$sha" != "" ]; then
 			cd $dest
 			echo "git fetch -q --unshallow"
-			git fetch -q --unshallow
+			${GIT_BIN} fetch -q --unshallow
 			echo "update to $sha"
-			git checkout $sha
+			${GIT_BIN} checkout $sha
 			cd $TESTDIR
 		fi
 
@@ -853,8 +855,8 @@ getVendorTestMaterial() {
 
 		# clean up
 		cd $dest
-		git rm -rqf .
-		git clean -fxd
+		${GIT_BIN} rm -rqf .
+		${GIT_BIN} clean -fxd
 		cd $TESTDIR
 
 	done
