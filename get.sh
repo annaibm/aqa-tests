@@ -13,6 +13,13 @@
 # limitations under the License.
 
 set -eo pipefail
+
+# On AIX, GNU tools (git, curl, etc.) are in /opt/freeware/bin but may not be on PATH.
+# Prepend it unconditionally on AIX so all subprocesses (TKG scripts, Ant tasks, etc.) find them.
+if [ "$(uname)" = "AIX" ]; then
+	export PATH=/opt/freeware/bin:$PATH
+fi
+
 SDKDIR=""
 TESTDIR="$(pwd)"
 PLATFORM=""
