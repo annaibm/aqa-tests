@@ -773,22 +773,22 @@ getVendorTestMaterial() {
 	declare -a vendor_dirs_array
 	local is_compliance_repo=false
 
-	# convert VENDOR_REPOS to array
-	vendor_repos_array=(`echo $VENDOR_REPOS | sed 's/,/\n/g'`)
+	# convert VENDOR_REPOS to array (use tr for AIX POSIX sed compatibility)
+	vendor_repos_array=(`echo $VENDOR_REPOS | tr ',' '\n'`)
 
 	if [ "$VENDOR_BRANCHES" != "" ]; then
 		# convert VENDOR_BRANCHES to array
-		vendor_branches_array=(`echo $VENDOR_BRANCHES | sed 's/,/\n/g'`)
+		vendor_branches_array=(`echo $VENDOR_BRANCHES | tr ',' '\n'`)
 	fi
 
 	if [ "$VENDOR_SHAS" != "" ]; then
 		#convert VENDOR_SHAS to array
-		vendor_shas_array=(`echo $VENDOR_SHAS | sed 's/,/\n/g'`)
+		vendor_shas_array=(`echo $VENDOR_SHAS | tr ',' '\n'`)
 	fi
 
 	if [ "$VENDOR_DIRS" != "" ]; then
 		#convert VENDOR_DIRS to array
-		vendor_dirs_array=(`echo $VENDOR_DIRS | sed 's/,/\n/g'`)
+		vendor_dirs_array=(`echo $VENDOR_DIRS | tr ',' '\n'`)
 	fi
 
 	for i in "${!vendor_repos_array[@]}"; do
