@@ -367,7 +367,7 @@ getBinaryOpenjdk()
 					file=${file}/${fileName}
 				fi
 			fi
-			executeCmdWithRetry "${file##*/}" "_ENCODE_FILE_NEW=UNTAGGED curl -OLJSk${CURL_OPTS} ${curl_options} $file"
+			executeCmdWithRetry "${file##*/}" "_ENCODE_FILE_NEW=UNTAGGED ${CURL_BIN:-curl} -OLJSk${CURL_OPTS} ${curl_options} $file"
 			rt_code=$?
 			if [ $rt_code != 0 ]; then
 				echo "curl error code: $rt_code"
