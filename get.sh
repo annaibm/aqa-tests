@@ -320,7 +320,7 @@ getBinaryOpenjdk()
 			else
 				download_url_base="${CUSTOMIZED_SDK_URL}/${arch}_${os}/"
 				# Artifactory cannot handle duplicate slashes (//) in URL. Remove // except after http:// or https://
-				download_url_base=$(echo "$download_url_base" | sed 's|([^:])/+|\1/|g')
+				download_url_base=$(echo "$download_url_base" | sed 's|\([^:]\)/\+|\1/|g')
 				echo "artifactory URL: ${download_url_base}"
 				download_api_url_base=(${download_url_base//\/ui\/native\//\/artifactory\/api\/storage\/})
 				if [[ $download_api_url_base != *"artifactory/api/storage"* ]]; then
@@ -341,7 +341,7 @@ getBinaryOpenjdk()
 						download_url+=" ${download_url_base}${n}"
 					fi
 				done
-				download_url=$(echo "$download_url" | sed 's|([^:])/+|\1/|g')
+				download_url=$(echo "$download_url" | sed 's|\([^:]\)/\+|\1/|g')
 			fi
 		else
 			download_url="https://api.adoptium.net/v3/binary/latest/${JDK_VERSION}/${release_type}/${os}/${arch}/jdk/${JDK_IMPL}/${heap_size}/adoptium?project=jdk https://api.adoptium.net/v3/binary/latest/${JDK_VERSION}/${release_type}/${os}/${arch}/sbom/${JDK_IMPL}/${heap_size}/adoptium?project=jdk"
